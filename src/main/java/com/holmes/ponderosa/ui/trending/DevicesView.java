@@ -28,12 +28,15 @@ import com.holmes.ponderosa.data.IntentFactory;
 import com.holmes.ponderosa.data.api.HomeSeerService;
 import com.holmes.ponderosa.data.api.Results;
 import com.holmes.ponderosa.data.api.model.Device;
+import com.holmes.ponderosa.data.api.model.DeviceControlResponse;
 import com.holmes.ponderosa.data.api.model.DevicesResponse;
 import com.holmes.ponderosa.data.api.transforms.DevicesResponseToDeviceList;
 import com.holmes.ponderosa.ui.misc.BetterViewAnimator;
 import com.holmes.ponderosa.ui.misc.DividerItemDecoration;
 import com.holmes.ponderosa.ui.misc.EnumAdapter;
 import com.squareup.picasso.Picasso;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import retrofit2.Response;
 import retrofit2.adapter.rxjava.Result;
@@ -116,19 +119,29 @@ public final class DevicesView extends LinearLayout
   @Override protected void onAttachedToWindow() {
     super.onAttachedToWindow();
 
-    Observable<Result<DevicesResponse>> result = timespanSubject //
+    Observable<Result<DevicesResponse>> devicesLookupResult = timespanSubject //
         .flatMap(deviceSearch) //
         .observeOn(AndroidSchedulers.mainThread()) //
         .share();
 
-    subscriptions.add(result //
+    subscriptions.add(devicesLookupResult //
         .filter(Results.isSuccessful()) //
         .map(DevicesResponseToDeviceList.instance()) //
         .subscribe(deviceAdapter));
-
-    subscriptions.add(result //
+    subscriptions.add(devicesLookupResult //
         .filter(Funcs.not(Results.isSuccessful())) //
         .subscribe(trendingError));
+
+    Observable<Result<DeviceControlResponse>> deviceControlResult = devicesLookupResult //
+        .filter(Results.isSuccessful()) //
+        .map(devicesResponseResult -> devicesResponseResult.response().body().Devices).map(
+        devices -> devices.stream().map(device -> device.ref).collect(Collectors.toList())).flatMap(
+        strings -> homeSeerService.deviceControls(strings).subscribeOn(Schedulers.io()));
+
+    deviceControlResult
+        .filter(Results.isSuccessful())
+        .map(result -> result.response().body().Devices)
+        .forEach(deviceControl -> Timber.d(deviceControl.name + " " + deviceControl.ControlPairs.size()));
 
     // Load the default selection.
     onRefresh();
@@ -138,9 +151,7 @@ public final class DevicesView extends LinearLayout
       new Func1<TrendingTimespan, Observable<Result<DevicesResponse>>>() {
         @Override
         public Observable<Result<DevicesResponse>> call(TrendingTimespan trendingTimespan) {
-          return homeSeerService
-              .devices()
-              .subscribeOn(Schedulers.io());
+          return homeSeerService.devices().subscribeOn(Schedulers.io());
         }
       };
 

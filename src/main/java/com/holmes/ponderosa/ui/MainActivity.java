@@ -80,7 +80,7 @@ public final class MainActivity extends Activity {
       return true;
     });
 
-    inflater.inflate(R.layout.trending_view, content);
+    inflater.inflate(R.layout.devices_view, content);
   }
 
   @Override public Object getSystemService(@NonNull String name) {

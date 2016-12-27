@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.api.model.Device;
+import com.holmes.ponderosa.data.api.model.DeviceControl;
 import com.squareup.picasso.Picasso;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,7 @@ final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
 
   private List<Device> devices = Collections.emptyList();
 
-  public DeviceAdapter(Picasso picasso, DeviceClickListener deviceClickListener) {
+  DeviceAdapter(Picasso picasso, DeviceClickListener deviceClickListener) {
     this.picasso = picasso;
     this.deviceClickListener = deviceClickListener;
     setHasStableIds(true);
@@ -33,8 +34,8 @@ final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
   }
 
   @Override public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-    TrendingItemView view = (TrendingItemView) LayoutInflater.from(viewGroup.getContext())
-        .inflate(R.layout.trending_view_repository, viewGroup, false);
+    DeviceItemView view = (DeviceItemView) LayoutInflater.from(viewGroup.getContext())
+        .inflate(R.layout.device_item_view, viewGroup, false);
     return new ViewHolder(view);
   }
 
@@ -50,10 +51,10 @@ final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
     return devices.size();
   }
 
-  public final class ViewHolder extends RecyclerView.ViewHolder {
-    public final TrendingItemView itemView;
+  final class ViewHolder extends RecyclerView.ViewHolder {
+    final DeviceItemView itemView;
 
-    public ViewHolder(TrendingItemView itemView) {
+    ViewHolder(DeviceItemView itemView) {
       super(itemView);
       this.itemView = itemView;
       this.itemView.setOnClickListener(v -> {
@@ -62,7 +63,7 @@ final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
       });
     }
 
-    public void bindTo(Device device) {
+    void bindTo(Device device) {
       itemView.bindTo(device, picasso);
     }
   }
