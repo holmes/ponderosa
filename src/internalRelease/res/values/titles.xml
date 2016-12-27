@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="application_name">U+2020 Sample Internal</string>
-  <string name="launcher_name">U+2020 Internal</string>
-  <string name="__leak_canary_display_activity_label">U+2020 Leaks</string>
+  <string name="application_name">Ponderosa Internal</string>
+  <string name="launcher_name">Ponderosa Internal</string>
+  <string name="__leak_canary_display_activity_label">Ponderosa Leaks</string>
 </resources>

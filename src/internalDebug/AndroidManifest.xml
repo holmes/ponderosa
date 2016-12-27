@@ -13,7 +13,7 @@
 
   <application>
     <activity
-        android:name="com.jakewharton.u2020.ui.DebugActivity"
+        android:name="com.holmes.ponderosa.ui.DebugActivity"
         android:label="U+2020 Dev Settings"
         android:launchMode="singleTask"
         android:theme="@style/Theme.U2020.Debug"
@@ -26,7 +26,7 @@
       </intent-filter>
     </activity>
     <activity
-        android:name="com.jakewharton.u2020.ui.ExternalIntentActivity"
+        android:name="com.holmes.ponderosa.ui.ExternalIntentActivity"
         android:theme="@style/Theme.U2020.External"
         >
       <intent-filter>
