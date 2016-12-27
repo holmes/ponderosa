@@ -1,21 +1,20 @@
 package com.holmes.ponderosa.ui.trending;
 
-import com.holmes.ponderosa.ui.trending.TrendingView;
 import com.holmes.ponderosa.ui.debug.ContextualDebugActions.DebugAction;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-@Singleton public final class ScrollBottomTrendingDebugAction extends DebugAction<TrendingView> {
+@Singleton public final class ScrollBottomTrendingDebugAction extends DebugAction<DevicesView> {
 
   @Inject public ScrollBottomTrendingDebugAction() {
-    super(TrendingView.class);
+    super(DevicesView.class);
   }
 
   @Override public String name() {
     return "Scroll to bottom";
   }
 
-  @Override public void run(TrendingView view) {
+  @Override public void run(DevicesView view) {
     view.trendingView.smoothScrollToPosition(view.trendingView.getAdapter().getItemCount() - 1);
   }
 }

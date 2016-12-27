@@ -46,7 +46,7 @@ import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
-public final class TrendingView extends LinearLayout
+public final class DevicesView extends LinearLayout
     implements SwipeRefreshLayout.OnRefreshListener, DeviceAdapter.DeviceClickListener {
   @BindView(R.id.trending_toolbar) Toolbar toolbarView;
   @BindView(R.id.trending_timespan) Spinner timespanView;
@@ -67,7 +67,7 @@ public final class TrendingView extends LinearLayout
   private final DeviceAdapter deviceAdapter;
   private final CompositeSubscription subscriptions = new CompositeSubscription();
 
-  public TrendingView(Context context, AttributeSet attrs) {
+  public DevicesView(Context context, AttributeSet attrs) {
     super(context, attrs);
     if (!isInEditMode()) {
       Injector.obtain(context).inject(this);

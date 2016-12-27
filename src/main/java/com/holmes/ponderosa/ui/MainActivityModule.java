@@ -3,7 +3,7 @@ package com.holmes.ponderosa.ui;
 import android.support.v4.widget.DrawerLayout;
 
 import com.holmes.ponderosa.PonderosaModule;
-import com.holmes.ponderosa.ui.trending.TrendingView;
+import com.holmes.ponderosa.ui.trending.DevicesView;
 
 import javax.inject.Singleton;
 
@@ -12,7 +12,7 @@ import dagger.Provides;
 
 @Module(
     addsTo = PonderosaModule.class,
-    injects = TrendingView.class
+    injects = DevicesView.class
 )
 public final class MainActivityModule {
   private final MainActivity mainActivity;
