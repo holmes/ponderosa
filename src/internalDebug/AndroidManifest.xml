@@ -14,7 +14,7 @@
   <application>
     <activity
         android:name="com.holmes.ponderosa.ui.DebugActivity"
-        android:label="U+2020 Dev Settings"
+        android:label="Ponderosa Dev Settings"
         android:launchMode="singleTask"
         android:theme="@style/Theme.U2020.Debug"
         android:screenOrientation="portrait"

@@ -16,26 +16,22 @@ import android.view.ContextThemeWrapper;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import butterknife.BindView;
+import android.widget.Toast;
 import butterknife.BindDimen;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
-
+import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.Funcs;
+import com.holmes.ponderosa.data.Injector;
 import com.holmes.ponderosa.data.IntentFactory;
-import com.holmes.ponderosa.data.api.GithubService;
-import com.holmes.ponderosa.data.api.Order;
+import com.holmes.ponderosa.data.api.HomeSeerService;
 import com.holmes.ponderosa.data.api.Results;
-import com.holmes.ponderosa.data.api.SearchQuery;
-import com.holmes.ponderosa.data.api.Sort;
-import com.holmes.ponderosa.data.api.model.RepositoriesResponse;
+import com.holmes.ponderosa.data.api.model.Device;
+import com.holmes.ponderosa.data.api.model.DevicesResponse;
+import com.holmes.ponderosa.data.api.transforms.DevicesResponseToDeviceList;
 import com.holmes.ponderosa.ui.misc.BetterViewAnimator;
 import com.holmes.ponderosa.ui.misc.DividerItemDecoration;
-import com.holmes.ponderosa.util.Intents;
-import com.holmes.ponderosa.R;
-import com.holmes.ponderosa.data.Injector;
-import com.holmes.ponderosa.data.api.model.Repository;
-import com.holmes.ponderosa.data.api.transforms.SearchResultToRepositoryList;
 import com.holmes.ponderosa.ui.misc.EnumAdapter;
 import com.squareup.picasso.Picasso;
 import javax.inject.Inject;
@@ -51,27 +47,24 @@ import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
 public final class TrendingView extends LinearLayout
-    implements SwipeRefreshLayout.OnRefreshListener, TrendingAdapter.RepositoryClickListener {
+    implements SwipeRefreshLayout.OnRefreshListener, DeviceAdapter.DeviceClickListener {
   @BindView(R.id.trending_toolbar) Toolbar toolbarView;
   @BindView(R.id.trending_timespan) Spinner timespanView;
-  @BindView(R.id.trending_animator)
-  BetterViewAnimator animatorView;
+  @BindView(R.id.trending_animator) BetterViewAnimator animatorView;
   @BindView(R.id.trending_swipe_refresh) SwipeRefreshLayout swipeRefreshView;
   @BindView(R.id.trending_list) RecyclerView trendingView;
   @BindView(R.id.trending_loading_message) TextView loadingMessageView;
 
   @BindDimen(R.dimen.trending_divider_padding_start) float dividerPaddingStart;
 
-  @Inject
-  GithubService githubService;
+  @Inject HomeSeerService homeSeerService;
   @Inject Picasso picasso;
-  @Inject
-  IntentFactory intentFactory;
+  @Inject IntentFactory intentFactory;
   @Inject DrawerLayout drawerLayout;
 
   private final PublishSubject<TrendingTimespan> timespanSubject;
   private final EnumAdapter<TrendingTimespan> timespanAdapter;
-  private final TrendingAdapter trendingAdapter;
+  private final DeviceAdapter deviceAdapter;
   private final CompositeSubscription subscriptions = new CompositeSubscription();
 
   public TrendingView(Context context, AttributeSet attrs) {
@@ -83,7 +76,7 @@ public final class TrendingView extends LinearLayout
     timespanSubject = PublishSubject.create();
     timespanAdapter = new TrendingTimespanAdapter(
         new ContextThemeWrapper(getContext(), R.style.Theme_U2020_TrendingTimespan));
-    trendingAdapter = new TrendingAdapter(picasso, this);
+    deviceAdapter = new DeviceAdapter(picasso, this);
   }
 
   @Override protected void onFinishInflate() {
@@ -104,9 +97,9 @@ public final class TrendingView extends LinearLayout
     swipeRefreshView.setColorSchemeResources(R.color.accent);
     swipeRefreshView.setOnRefreshListener(this);
 
-    trendingAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+    deviceAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
       @Override public void onChanged() {
-        animatorView.setDisplayedChildId(trendingAdapter.getItemCount() == 0 //
+        animatorView.setDisplayedChildId(deviceAdapter.getItemCount() == 0 //
             ? R.id.trending_empty //
             : R.id.trending_swipe_refresh);
         swipeRefreshView.setRefreshing(false);
@@ -115,21 +108,24 @@ public final class TrendingView extends LinearLayout
 
     trendingView.setLayoutManager(new LinearLayoutManager(getContext()));
     trendingView.addItemDecoration(
-        new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, dividerPaddingStart, safeIsRtl()));
-    trendingView.setAdapter(trendingAdapter);
+        new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST,
+            dividerPaddingStart, safeIsRtl()));
+    trendingView.setAdapter(deviceAdapter);
   }
 
   @Override protected void onAttachedToWindow() {
     super.onAttachedToWindow();
 
-    Observable<Result<RepositoriesResponse>> result = timespanSubject //
-        .flatMap(trendingSearch) //
+    Observable<Result<DevicesResponse>> result = timespanSubject //
+        .flatMap(deviceSearch) //
         .observeOn(AndroidSchedulers.mainThread()) //
         .share();
+
     subscriptions.add(result //
         .filter(Results.isSuccessful()) //
-        .map(SearchResultToRepositoryList.instance()) //
-        .subscribe(trendingAdapter));
+        .map(DevicesResponseToDeviceList.instance()) //
+        .subscribe(deviceAdapter));
+
     subscriptions.add(result //
         .filter(Funcs.not(Results.isSuccessful())) //
         .subscribe(trendingError));
@@ -138,30 +134,29 @@ public final class TrendingView extends LinearLayout
     onRefresh();
   }
 
-  private final Func1<TrendingTimespan, Observable<Result<RepositoriesResponse>>> trendingSearch =
-      new Func1<TrendingTimespan, Observable<Result<RepositoriesResponse>>>() {
+  private final Func1<TrendingTimespan, Observable<Result<DevicesResponse>>> deviceSearch =
+      new Func1<TrendingTimespan, Observable<Result<DevicesResponse>>>() {
         @Override
-        public Observable<Result<RepositoriesResponse>> call(TrendingTimespan trendingTimespan) {
-          SearchQuery trendingQuery = new SearchQuery.Builder() //
-              .createdSince(trendingTimespan.createdSince()) //
-              .build();
-          return githubService.repositories(trendingQuery, Sort.STARS, Order.DESC)
+        public Observable<Result<DevicesResponse>> call(TrendingTimespan trendingTimespan) {
+          return homeSeerService
+              .devices()
               .subscribeOn(Schedulers.io());
         }
       };
 
-  private final Action1<Result<RepositoriesResponse>> trendingError = new Action1<Result<RepositoriesResponse>>() {
-    @Override public void call(Result<RepositoriesResponse> result) {
-      if (result.isError()) {
-        Timber.e(result.error(), "Failed to get trending repositories");
-      } else {
-        Response<RepositoriesResponse> response = result.response();
-        Timber.e("Failed to get trending repositories. Server returned %d", response.code());
-      }
-      swipeRefreshView.setRefreshing(false);
-      animatorView.setDisplayedChildId(R.id.trending_error);
-    }
-  };
+  private final Action1<Result<DevicesResponse>> trendingError =
+      new Action1<Result<DevicesResponse>>() {
+        @Override public void call(Result<DevicesResponse> result) {
+          if (result.isError()) {
+            Timber.e(result.error(), "Failed to get trending repositories");
+          } else {
+            Response<DevicesResponse> response = result.response();
+            Timber.e("Failed to get trending repositories. Server returned %d", response.code());
+          }
+          swipeRefreshView.setRefreshing(false);
+          animatorView.setDisplayedChildId(R.id.trending_error);
+        }
+      };
 
   @Override protected void onDetachedFromWindow() {
     super.onDetachedFromWindow();
@@ -185,8 +180,9 @@ public final class TrendingView extends LinearLayout
     timespanSelected(timespanView.getSelectedItemPosition());
   }
 
-  @Override public void onRepositoryClick(Repository repository) {
-    Intents.maybeStartActivity(getContext(), intentFactory.createUrlIntent(repository.html_url));
+  @Override public void onDeviceTapped(Device device) {
+    Toast.makeText(getContext(), "tapped on " + device.name, Toast.LENGTH_LONG).show();
+    //Intents.maybeStartActivity(getContext(), intentFactory.createUrlIntent(device.html_url));
   }
 
   private boolean safeIsRtl() {

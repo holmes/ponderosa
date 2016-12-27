@@ -4,7 +4,6 @@ import com.holmes.ponderosa.data.api.ApiModule;
 
 public enum ApiEndpoints {
   PRODUCTION("Production", ApiModule.PRODUCTION_API_URL.toString()),
-  // STAGING("Staging", "https://api.staging.github.com/"),
   MOCK_MODE("Mock Mode", "http://localhost/mock/"),
   CUSTOM("Custom", null);
 

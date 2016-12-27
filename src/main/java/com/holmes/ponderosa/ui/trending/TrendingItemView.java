@@ -12,10 +12,10 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import com.holmes.ponderosa.data.api.model.Device;
 import com.holmes.ponderosa.ui.misc.Truss;
 import com.holmes.ponderosa.ui.transform.CircleStrokeTransformation;
 import com.holmes.ponderosa.R;
-import com.holmes.ponderosa.data.api.model.Repository;
 import com.squareup.picasso.Picasso;
 
 public final class TrendingItemView extends RelativeLayout {
@@ -45,26 +45,26 @@ public final class TrendingItemView extends RelativeLayout {
     ButterKnife.bind(this);
   }
 
-  public void bindTo(Repository repository, Picasso picasso) {
-    picasso.load(repository.owner.avatar_url)
-        .placeholder(R.drawable.avatar)
-        .fit()
-        .transform(avatarTransformation)
-        .into(avatarView);
-    nameView.setText(repository.name);
-    starsView.setText(String.valueOf(repository.watchers));
-    forksView.setText(String.valueOf(repository.forks));
-
-    Truss description = new Truss();
-    description.append(repository.owner.login);
-
-    if (!TextUtils.isEmpty(repository.description)) {
-      description.pushSpan(new ForegroundColorSpan(descriptionColor));
-      description.append(" — ");
-      description.append(repository.description);
-      description.popSpan();
-    }
-
-    descriptionView.setText(description.build());
+  public void bindTo(Device device, Picasso picasso) {
+    //picasso.load(device.owner.avatar_url)
+    //    .placeholder(R.drawable.avatar)
+    //    .fit()
+    //    .transform(avatarTransformation)
+    //    .into(avatarView);
+    //nameView.setText(device.name);
+    //starsView.setText(String.valueOf(device.watchers));
+    //forksView.setText(String.valueOf(device.forks));
+    //
+    //Truss description = new Truss();
+    //description.append(device.owner.login);
+    //
+    //if (!TextUtils.isEmpty(device.description)) {
+    //  description.pushSpan(new ForegroundColorSpan(descriptionColor));
+    //  description.append(" — ");
+    //  description.append(device.description);
+    //  description.popSpan();
+    //}
+    //
+    //descriptionView.setText(description.build());
   }
 }

@@ -4,31 +4,31 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import com.holmes.ponderosa.R;
-import com.holmes.ponderosa.data.api.model.Repository;
+import com.holmes.ponderosa.data.api.model.Device;
 import com.squareup.picasso.Picasso;
 import java.util.Collections;
 import java.util.List;
 import rx.functions.Action1;
 
-final class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.ViewHolder>
-    implements Action1<List<Repository>> {
-  public interface RepositoryClickListener {
-    void onRepositoryClick(Repository repository);
+final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
+    implements Action1<List<Device>> {
+  public interface DeviceClickListener {
+    void onDeviceTapped(Device repository);
   }
 
   private final Picasso picasso;
-  private final RepositoryClickListener repositoryClickListener;
+  private final DeviceClickListener deviceClickListener;
 
-  private List<Repository> repositories = Collections.emptyList();
+  private List<Device> devices = Collections.emptyList();
 
-  public TrendingAdapter(Picasso picasso, RepositoryClickListener repositoryClickListener) {
+  public DeviceAdapter(Picasso picasso, DeviceClickListener deviceClickListener) {
     this.picasso = picasso;
-    this.repositoryClickListener = repositoryClickListener;
+    this.deviceClickListener = deviceClickListener;
     setHasStableIds(true);
   }
 
-  @Override public void call(List<Repository> repositories) {
-    this.repositories = repositories;
+  @Override public void call(List<Device> devices) {
+    this.devices = devices;
     notifyDataSetChanged();
   }
 
@@ -39,7 +39,7 @@ final class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.ViewHol
   }
 
   @Override public void onBindViewHolder(ViewHolder viewHolder, int i) {
-    viewHolder.bindTo(repositories.get(i));
+    viewHolder.bindTo(devices.get(i));
   }
 
   @Override public long getItemId(int position) {
@@ -47,7 +47,7 @@ final class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.ViewHol
   }
 
   @Override public int getItemCount() {
-    return repositories.size();
+    return devices.size();
   }
 
   public final class ViewHolder extends RecyclerView.ViewHolder {
@@ -57,13 +57,13 @@ final class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.ViewHol
       super(itemView);
       this.itemView = itemView;
       this.itemView.setOnClickListener(v -> {
-        Repository repository = repositories.get(getAdapterPosition());
-        repositoryClickListener.onRepositoryClick(repository);
+        Device device = devices.get(getAdapterPosition());
+        deviceClickListener.onDeviceTapped(device);
       });
     }
 
-    public void bindTo(Repository repository) {
-      itemView.bindTo(repository, picasso);
+    public void bindTo(Device device) {
+      itemView.bindTo(device, picasso);
     }
   }
 }
