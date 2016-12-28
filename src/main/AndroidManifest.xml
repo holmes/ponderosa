@@ -32,9 +32,5 @@
       </intent-filter>
     </activity>
 
-    <service
-        android:name="com.holmes.ponderosa.data.api.oauth.OauthService"
-        android:exported="false"
-        />
   </application>
 </manifest>

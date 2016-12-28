@@ -1,6 +1,5 @@
-package com.holmes.ponderosa.data.api.oauth;
+package com.holmes.ponderosa.data.api.auth;
 
-import com.f2prateek.rx.preferences.Preference;
 import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -10,10 +9,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 @Singleton public final class AuthInterceptor implements Interceptor {
-  private final Preference<String> accessToken;
-
-  @Inject public AuthInterceptor(@AccessToken Preference<String> accessToken) {
-    this.accessToken = accessToken;
+  @Inject public AuthInterceptor() {
   }
 
   @Override public Response intercept(Chain chain) throws IOException {

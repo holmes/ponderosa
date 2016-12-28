@@ -1,7 +1,6 @@
 package com.holmes.ponderosa;
 
 import android.app.Application;
-
 import com.holmes.ponderosa.data.DataModule;
 import com.holmes.ponderosa.ui.UiModule;
 import dagger.Module;

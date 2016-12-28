@@ -1,7 +1,6 @@
 package com.holmes.ponderosa.data.api;
 
-import com.holmes.ponderosa.data.api.oauth.AuthInterceptor;
-import com.holmes.ponderosa.data.api.oauth.OauthService;
+import com.holmes.ponderosa.data.api.auth.AuthInterceptor;
 import com.squareup.moshi.Moshi;
 import dagger.Module;
 import dagger.Provides;
@@ -15,10 +14,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 
 @Module(
     complete = false,
-    library = true,
-    injects = {
-        OauthService.class
-    }
+    library = true
 )
 public final class ApiModule {
   public static final HttpUrl PRODUCTION_API_URL = HttpUrl.parse("https://connected.homeseer.com/");

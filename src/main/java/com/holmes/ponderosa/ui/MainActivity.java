@@ -2,9 +2,7 @@ package com.holmes.ponderosa.ui;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,14 +13,11 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Toast;
-import butterknife.BindView;
 import butterknife.BindColor;
+import butterknife.BindView;
 import butterknife.ButterKnife;
-
 import com.holmes.ponderosa.R;
-import com.holmes.ponderosa.data.api.oauth.OauthService;
 import com.holmes.ponderosa.data.Injector;
-
 import dagger.ObjectGraph;
 import javax.inject.Inject;
 
@@ -93,19 +88,6 @@ public final class MainActivity extends Activity {
   @Override protected void onDestroy() {
     activityGraph = null;
     super.onDestroy();
-  }
-
-  @Override protected void onNewIntent(Intent intent) {
-    super.onNewIntent(intent);
-
-    Uri data = intent.getData();
-    if (data == null) return;
-
-    if ("u2020".equals(data.getScheme())) {
-      Intent serviceIntent = new Intent(this, OauthService.class);
-      serviceIntent.setData(data);
-      startService(serviceIntent);
-    }
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)

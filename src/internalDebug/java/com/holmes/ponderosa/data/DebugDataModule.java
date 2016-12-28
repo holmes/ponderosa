@@ -4,12 +4,9 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import com.f2prateek.rx.preferences.Preference;
 import com.f2prateek.rx.preferences.RxSharedPreferences;
-import com.holmes.ponderosa.data.DataModule;
-import com.holmes.ponderosa.data.IntentFactory;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.holmes.ponderosa.IsInstrumentationTest;
 import com.holmes.ponderosa.data.api.DebugApiModule;
-import com.holmes.ponderosa.data.api.oauth.AccessToken;
 import com.holmes.ponderosa.data.prefs.InetSocketAddressPreferenceAdapter;
 import com.squareup.picasso.Picasso;
 import dagger.Module;
@@ -58,12 +55,6 @@ public final class DebugDataModule {
         .sslSocketFactory(createBadSslSocketFactory())
         .proxy(InetSocketAddressPreferenceAdapter.createProxy(networkProxyAddress.get()))
         .build();
-  }
-
-  @Provides @Singleton @AccessToken Preference<String> provideAccessToken(RxSharedPreferences prefs,
-      @ApiEndpoint Preference<String> endpoint) {
-    // Return an endpoint-specific preference.
-    return prefs.getString("access-token-" + endpoint.get());
   }
 
   @Provides @Singleton @ApiEndpoint

@@ -1,17 +1,14 @@
 package com.holmes.ponderosa.data.api;
 
 import com.f2prateek.rx.preferences.Preference;
-import com.holmes.ponderosa.data.ApiEndpoint;
-import com.holmes.ponderosa.data.IsMockMode;
 import com.holmes.ponderosa.data.NetworkDelay;
 import com.holmes.ponderosa.data.NetworkFailurePercent;
 import com.holmes.ponderosa.data.NetworkVariancePercent;
-import com.holmes.ponderosa.data.api.oauth.AuthInterceptor;
+import com.holmes.ponderosa.data.api.auth.AuthInterceptor;
 import dagger.Module;
 import dagger.Provides;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
