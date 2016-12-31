@@ -20,31 +20,22 @@ import android.widget.Toast;
 import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnItemSelected;
+import com.holmes.ponderosa.DeviceModel;
 import com.holmes.ponderosa.R;
-import com.holmes.ponderosa.data.Funcs;
+import com.holmes.ponderosa.data.DataFetcher;
 import com.holmes.ponderosa.data.Injector;
 import com.holmes.ponderosa.data.IntentFactory;
-import com.holmes.ponderosa.data.api.HomeSeerService;
-import com.holmes.ponderosa.data.api.Results;
-import com.holmes.ponderosa.data.api.model.Device;
-import com.holmes.ponderosa.data.api.model.DeviceControlResponse;
-import com.holmes.ponderosa.data.api.model.DevicesResponse;
-import com.holmes.ponderosa.data.api.transforms.DevicesResponseToDeviceList;
+import com.holmes.ponderosa.data.sql.model.Device;
 import com.holmes.ponderosa.ui.misc.BetterViewAnimator;
 import com.holmes.ponderosa.ui.misc.DividerItemDecoration;
 import com.holmes.ponderosa.ui.misc.EnumAdapter;
 import com.squareup.picasso.Picasso;
+import com.squareup.sqlbrite.BriteDatabase;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
-import retrofit2.Response;
-import retrofit2.adapter.rxjava.Result;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
@@ -60,7 +51,8 @@ public final class DevicesView extends LinearLayout
 
   @BindDimen(R.dimen.trending_divider_padding_start) float dividerPaddingStart;
 
-  @Inject HomeSeerService homeSeerService;
+  @Inject BriteDatabase db;
+  @Inject DataFetcher dataFetcher;
   @Inject Picasso picasso;
   @Inject IntentFactory intentFactory;
   @Inject DrawerLayout drawerLayout;
@@ -70,6 +62,14 @@ public final class DevicesView extends LinearLayout
   private final DeviceAdapter deviceAdapter;
   private final CompositeSubscription subscriptions = new CompositeSubscription();
 
+  private Action1<List<Device>> updateViewAction = devices -> {
+    Timber.d("why the fuxk doesn't this work?");
+    animatorView.setDisplayedChildId(devices.isEmpty() //
+        ? R.id.trending_empty //
+        : R.id.trending_swipe_refresh);
+    swipeRefreshView.setRefreshing(false);
+  };
+
   public DevicesView(Context context, AttributeSet attrs) {
     super(context, attrs);
     if (!isInEditMode()) {
@@ -77,8 +77,8 @@ public final class DevicesView extends LinearLayout
     }
 
     timespanSubject = PublishSubject.create();
-    timespanAdapter = new TrendingTimespanAdapter(
-        new ContextThemeWrapper(getContext(), R.style.Theme_U2020_TrendingTimespan));
+    timespanAdapter =
+        new TrendingTimespanAdapter(new ContextThemeWrapper(getContext(), R.style.Theme_U2020_TrendingTimespan));
     deviceAdapter = new DeviceAdapter(picasso, this);
   }
 
@@ -100,81 +100,46 @@ public final class DevicesView extends LinearLayout
     swipeRefreshView.setColorSchemeResources(R.color.accent);
     swipeRefreshView.setOnRefreshListener(this);
 
-    deviceAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-      @Override public void onChanged() {
-        animatorView.setDisplayedChildId(deviceAdapter.getItemCount() == 0 //
-            ? R.id.trending_empty //
-            : R.id.trending_swipe_refresh);
-        swipeRefreshView.setRefreshing(false);
-      }
-    });
-
     trendingView.setLayoutManager(new LinearLayoutManager(getContext()));
     trendingView.addItemDecoration(
-        new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST,
-            dividerPaddingStart, safeIsRtl()));
+        new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, dividerPaddingStart, safeIsRtl()));
     trendingView.setAdapter(deviceAdapter);
   }
 
   @Override protected void onAttachedToWindow() {
     super.onAttachedToWindow();
 
-    Observable<Result<DevicesResponse>> devicesLookupResult = timespanSubject //
-        .flatMap(deviceSearch) //
-        .observeOn(AndroidSchedulers.mainThread()) //
-        .share();
+    Observable<List<Device>> query = db.createQuery(DeviceModel.TABLE_NAME, DeviceModel.SELECT_ALL) //
+        .mapToList(Device.SELECT_ALL_MAPPER::map) //
+        .observeOn(AndroidSchedulers.mainThread());
 
-    subscriptions.add(devicesLookupResult //
-        .filter(Results.isSuccessful()) //
-        .map(DevicesResponseToDeviceList.instance()) //
-        .subscribe(deviceAdapter));
-    subscriptions.add(devicesLookupResult //
-        .filter(Funcs.not(Results.isSuccessful())) //
-        .subscribe(trendingError));
-
-    Observable<Result<DeviceControlResponse>> deviceControlResult = devicesLookupResult //
-        .filter(Results.isSuccessful()) //
-        .map(devicesResponseResult -> devicesResponseResult.response().body().Devices).map(
-        devices -> devices.stream().map(device -> device.ref).collect(Collectors.toList())).flatMap(
-        strings -> homeSeerService.deviceControls(strings).subscribeOn(Schedulers.io()));
-
-    deviceControlResult
-        .filter(Results.isSuccessful())
-        .map(result -> result.response().body().Devices)
-        .forEach(deviceControl -> Timber.d(deviceControl.name + " " + deviceControl.ControlPairs.size()));
+    subscriptions.add(query.subscribe(deviceAdapter));
+    subscriptions.add(query.subscribe(updateViewAction));
 
     // Load the default selection.
-    onRefresh();
+    //onRefresh();
   }
 
-  private final Func1<TrendingTimespan, Observable<Result<DevicesResponse>>> deviceSearch =
-      new Func1<TrendingTimespan, Observable<Result<DevicesResponse>>>() {
-        @Override
-        public Observable<Result<DevicesResponse>> call(TrendingTimespan trendingTimespan) {
-          return homeSeerService.devices().subscribeOn(Schedulers.io());
-        }
-      };
-
-  private final Action1<Result<DevicesResponse>> trendingError =
-      new Action1<Result<DevicesResponse>>() {
-        @Override public void call(Result<DevicesResponse> result) {
-          if (result.isError()) {
-            Timber.e(result.error(), "Failed to get trending repositories");
-          } else {
-            Response<DevicesResponse> response = result.response();
-            Timber.e("Failed to get trending repositories. Server returned %d", response.code());
-          }
-          swipeRefreshView.setRefreshing(false);
-          animatorView.setDisplayedChildId(R.id.trending_error);
-        }
-      };
+  //private final Action1<Result<HSDevicesResponse>> trendingError = new Action1<Result<HSDevicesResponse>>() {
+  //  @Override public void call(Result<HSDevicesResponse> result) {
+  //    if (result.isError()) {
+  //      Timber.e(result.error(), "Failed to get trending repositories");
+  //    } else {
+  //      Response<HSDevicesResponse> response = result.response();
+  //      Timber.e("Failed to get trending repositories. Server returned %d", response.code());
+  //    }
+  //    swipeRefreshView.setRefreshing(false);
+  //    animatorView.setDisplayedChildId(R.id.trending_error);
+  //  }
+  //};
 
   @Override protected void onDetachedFromWindow() {
     super.onDetachedFromWindow();
     subscriptions.unsubscribe();
   }
 
-  @OnItemSelected(R.id.trending_timespan) void timespanSelected(final int position) {
+  //@OnItemSelected(R.id.trending_timespan)
+  void timespanSelected(final int position) {
     if (animatorView.getDisplayedChildId() != R.id.trending_swipe_refresh) {
       animatorView.setDisplayedChildId(R.id.trending_loading);
     }
@@ -182,8 +147,10 @@ public final class DevicesView extends LinearLayout
     // For whatever reason, the SRL's spinner does not draw itself when we call setRefreshing(true)
     // unless it is posted.
     post(() -> {
+      Timber.d("Setting refresh to true");
       swipeRefreshView.setRefreshing(true);
-      timespanSubject.onNext(timespanAdapter.getItem(position));
+      dataFetcher.refresh();
+      //timespanSubject.onNext(timespanAdapter.getItem(position));
     });
   }
 
@@ -192,8 +159,7 @@ public final class DevicesView extends LinearLayout
   }
 
   @Override public void onDeviceTapped(Device device) {
-    Toast.makeText(getContext(), "tapped on " + device.name, Toast.LENGTH_LONG).show();
-    //Intents.maybeStartActivity(getContext(), intentFactory.createUrlIntent(device.html_url));
+    Toast.makeText(getContext(), "tapped on " + device.name(), Toast.LENGTH_SHORT).show();
   }
 
   private boolean safeIsRtl() {

@@ -3,16 +3,14 @@ package com.holmes.ponderosa.ui.trending;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import com.holmes.ponderosa.data.api.model.Device;
-import com.holmes.ponderosa.ui.transform.CircleStrokeTransformation;
 import com.holmes.ponderosa.R;
+import com.holmes.ponderosa.data.sql.model.Device;
+import com.holmes.ponderosa.ui.transform.CircleStrokeTransformation;
 import com.squareup.picasso.Picasso;
 
 public final class DeviceItemView extends RelativeLayout {
@@ -35,12 +33,12 @@ public final class DeviceItemView extends RelativeLayout {
   }
 
   public void bindTo(Device device, Picasso picasso) {
-    picasso.load(device.statusImage)
-        .placeholder(R.drawable.avatar)
-        .fit()
-        .transform(avatarTransformation)
-        .into(avatarView);
+    //picasso.load(device.location())
+    //    .placeholder(R.drawable.avatar)
+    //    .fit()
+    //    .transform(avatarTransformation)
+    //    .into(avatarView);
 
-    nameView.setText(device.location + " " + device.name);
+    nameView.setText(device.location() + " " + device.name());
   }
 }

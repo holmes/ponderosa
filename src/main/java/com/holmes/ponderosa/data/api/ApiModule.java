@@ -1,5 +1,6 @@
 package com.holmes.ponderosa.data.api;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.holmes.ponderosa.data.api.auth.AuthInterceptor;
 import com.squareup.moshi.Moshi;
 import dagger.Module;
@@ -44,6 +45,7 @@ public final class ApiModule {
 
   static OkHttpClient.Builder createApiClient(OkHttpClient client, AuthInterceptor authInterceptor) {
     return client.newBuilder()
-        .addInterceptor(authInterceptor);
+        .addInterceptor(authInterceptor)
+        .addNetworkInterceptor(new StethoInterceptor());
   }
 }

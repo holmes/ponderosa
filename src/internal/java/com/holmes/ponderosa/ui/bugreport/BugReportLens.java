@@ -93,7 +93,7 @@ public final class BugReportLens implements Lens, ReportListener {
         body.append("Version code: ").append(BuildConfig.VERSION_CODE).append('\n');
         body.append("{panel}\n\n");
 
-        body.append("{panel:title=Device}\n");
+        body.append("{panel:title=HSDevice}\n");
         body.append("Make: ").append(Build.MANUFACTURER).append('\n');
         body.append("Model: ").append(Build.MODEL).append('\n');
         body.append("Resolution: ")

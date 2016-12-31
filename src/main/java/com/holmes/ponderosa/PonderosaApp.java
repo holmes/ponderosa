@@ -2,11 +2,12 @@ package com.holmes.ponderosa;
 
 import android.app.Application;
 import android.support.annotation.NonNull;
-
-import com.holmes.ponderosa.ui.ActivityHierarchyServer;
-import com.jakewharton.threetenabp.AndroidThreeTen;
+import com.facebook.stetho.Stetho;
+import com.holmes.ponderosa.data.DataFetcher;
 import com.holmes.ponderosa.data.Injector;
 import com.holmes.ponderosa.data.LumberYard;
+import com.holmes.ponderosa.ui.ActivityHierarchyServer;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.squareup.leakcanary.LeakCanary;
 import dagger.ObjectGraph;
 import javax.inject.Inject;
@@ -17,12 +18,13 @@ import static timber.log.Timber.DebugTree;
 public final class PonderosaApp extends Application {
   private ObjectGraph objectGraph;
 
-  @Inject
-  ActivityHierarchyServer activityHierarchyServer;
+  @Inject ActivityHierarchyServer activityHierarchyServer;
   @Inject LumberYard lumberYard;
+  @Inject DataFetcher dataFetcher;
 
   @Override public void onCreate() {
     super.onCreate();
+    Stetho.initializeWithDefaults(this);
     AndroidThreeTen.init(this);
     LeakCanary.install(this);
 
@@ -38,6 +40,8 @@ public final class PonderosaApp extends Application {
 
     lumberYard.cleanUp();
     Timber.plant(lumberYard.tree());
+
+    dataFetcher.refresh();
 
     registerActivityLifecycleCallbacks(activityHierarchyServer);
   }

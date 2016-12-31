@@ -1,8 +1,7 @@
 package com.holmes.ponderosa.data.api;
 
-import com.holmes.ponderosa.data.api.model.DeviceControl;
-import com.holmes.ponderosa.data.api.model.DeviceControlResponse;
-import com.holmes.ponderosa.data.api.model.DevicesResponse;
+import com.holmes.ponderosa.data.api.model.HSDeviceControlResponse;
+import com.holmes.ponderosa.data.api.model.HSDevicesResponse;
 import java.util.List;
 import javax.inject.Inject;
 import retrofit2.adapter.rxjava.Result;
@@ -14,11 +13,11 @@ public class MockHomeSeerService implements HomeSeerService {
   public MockHomeSeerService() {
   }
 
-  @Override public Observable<Result<DevicesResponse>> devices() {
+  @Override public Observable<Result<HSDevicesResponse>> devices() {
     throw new UnsupportedOperationException("implement me!");
   }
 
-  @Override public Observable<Result<DeviceControlResponse>> deviceControls(
+  @Override public Observable<Result<HSDeviceControlResponse>> deviceControls(
       @Query("ref") List<String> references) {
     throw new UnsupportedOperationException("implement me!");
   }

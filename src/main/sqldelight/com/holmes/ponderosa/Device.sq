@@ -1,0 +1,13 @@
+CREATE TABLE devices (
+  ref TEXT NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  location TEXT NOT NULL
+);
+
+select_all:
+SELECT *
+FROM devices;
+
+insert_row:
+INSERT OR REPLACE INTO devices(ref, name, location)
+VALUES (?, ?, ?);

@@ -1,0 +1,14 @@
+CREATE TABLE device_control (
+  _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  device_ref TEXT NOT NULL,
+  label TEXT NOT NULL,
+  type INTEGER NOT NULL,
+  use INTEGER NOT NULL
+);
+
+unique_key:
+CREATE UNIQUE INDEX device_control_key ON device_control(device_ref, type, use);
+
+insert_row:
+INSERT OR REPLACE INTO device_control(device_ref, label, type, use)
+VALUES (?, ?, ?, ?);
