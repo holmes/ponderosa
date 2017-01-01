@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import com.f2prateek.rx.preferences.Preference;
 import com.f2prateek.rx.preferences.RxSharedPreferences;
+import com.holmes.ponderosa.data.api.auth.AuthInterceptor;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.holmes.ponderosa.IsInstrumentationTest;
 import com.holmes.ponderosa.data.api.DebugApiModule;
@@ -50,8 +51,8 @@ public final class DebugDataModule {
   }
 
   @Provides @Singleton OkHttpClient provideOkHttpClient(Application app,
-      Preference<InetSocketAddress> networkProxyAddress) {
-    return DataModule.createOkHttpClient(app)
+      Preference<InetSocketAddress> networkProxyAddress, AuthInterceptor authInterceptor) {
+    return DataModule.createOkHttpClient(app, authInterceptor)
         .sslSocketFactory(createBadSslSocketFactory())
         .proxy(InetSocketAddressPreferenceAdapter.createProxy(networkProxyAddress.get()))
         .build();

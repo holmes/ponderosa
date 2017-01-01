@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import com.f2prateek.rx.preferences.RxSharedPreferences;
 import com.holmes.ponderosa.data.api.ApiModule;
+import com.holmes.ponderosa.data.api.auth.AuthInterceptor;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.moshi.Moshi;
 import com.squareup.picasso.Picasso;
@@ -49,23 +50,26 @@ public final class DataModule {
     return IntentFactory.REAL;
   }
 
-  @Provides @Singleton OkHttpClient provideOkHttpClient(Application app) {
-    return createOkHttpClient(app).build();
+  @Provides @Singleton OkHttpClient provideOkHttpClient(Application app, AuthInterceptor authInterceptor) {
+    return createOkHttpClient(app, authInterceptor).build();
   }
 
   @Provides @Singleton Picasso providePicasso(Application app, OkHttpClient client) {
+    OkHttp3Downloader downloader = new OkHttp3Downloader(client);
+
     return new Picasso.Builder(app)
-        .downloader(new OkHttp3Downloader(client))
+        .downloader(downloader)
         .listener((picasso, uri, e) -> Timber.e(e, "Failed to load image: %s", uri))
         .build();
   }
 
-  static OkHttpClient.Builder createOkHttpClient(Application app) {
+  static OkHttpClient.Builder createOkHttpClient(Application app, AuthInterceptor authInterceptor) {
     // Install an HTTP cache in the application cache directory.
     File cacheDir = new File(app.getCacheDir(), "http");
     Cache cache = new Cache(cacheDir, DISK_CACHE_SIZE);
 
     return new OkHttpClient.Builder()
+        .addInterceptor(authInterceptor)
         .cache(cache);
   }
 }

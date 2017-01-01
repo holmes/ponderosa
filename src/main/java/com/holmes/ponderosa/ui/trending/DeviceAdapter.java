@@ -5,13 +5,14 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.sql.model.Device;
+import com.holmes.ponderosa.data.sql.model.DeviceControl;
 import com.squareup.picasso.Picasso;
 import java.util.Collections;
 import java.util.List;
-import rx.functions.Action1;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
-    implements Action1<List<Device>> {
+final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder> {
   public interface DeviceClickListener {
     void onDeviceTapped(Device repository);
   }
@@ -20,6 +21,7 @@ final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
   private final DeviceClickListener deviceClickListener;
 
   private List<Device> devices = Collections.emptyList();
+  private Map<String, List<DeviceControl>> controls = Collections.emptyMap();
 
   DeviceAdapter(Picasso picasso, DeviceClickListener deviceClickListener) {
     this.picasso = picasso;
@@ -27,8 +29,13 @@ final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
     setHasStableIds(true);
   }
 
-  @Override public void call(List<Device> devices) {
+  public void updateDevices(List<Device> devices) {
     this.devices = devices;
+    notifyDataSetChanged();
+  }
+
+  public void updateControls(List<DeviceControl> controls) {
+    this.controls = controls.stream().collect(Collectors.groupingBy(DeviceControl::device_ref));
     notifyDataSetChanged();
   }
 
@@ -39,7 +46,9 @@ final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
   }
 
   @Override public void onBindViewHolder(ViewHolder viewHolder, int i) {
-    viewHolder.bindTo(devices.get(i));
+    Device device = devices.get(i);
+    List<DeviceControl> deviceControls = controls.get(device.ref());
+    viewHolder.bindTo(device, deviceControls);
   }
 
   @Override public long getItemId(int position) {
@@ -62,8 +71,12 @@ final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
       });
     }
 
-    void bindTo(Device device) {
-      itemView.bindTo(device, picasso);
+    void bindTo(Device device, List<DeviceControl> deviceControls) {
+      String title = device.location() + " " + device.name();
+      String status = device.status();
+
+      DeviceItemView.DeviceItemViewModel model = new DeviceItemView.DeviceItemViewModel(title, status);
+      itemView.bindTo(model);
     }
   }
 }

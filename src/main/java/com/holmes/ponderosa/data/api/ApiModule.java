@@ -1,7 +1,6 @@
 package com.holmes.ponderosa.data.api;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
-import com.holmes.ponderosa.data.api.auth.AuthInterceptor;
 import com.squareup.moshi.Moshi;
 import dagger.Module;
 import dagger.Provides;
@@ -24,9 +23,8 @@ public final class ApiModule {
     return PRODUCTION_API_URL;
   }
 
-  @Provides @Singleton @Named("Api") OkHttpClient provideApiClient(OkHttpClient client,
-      AuthInterceptor authInterceptor) {
-    return createApiClient(client, authInterceptor).build();
+  @Provides @Singleton @Named("Api") OkHttpClient provideApiClient(OkHttpClient client) {
+    return createApiClient(client).build();
   }
 
   @Provides @Singleton Retrofit provideRetrofit(HttpUrl baseUrl, @Named("Api") OkHttpClient client,
@@ -43,9 +41,8 @@ public final class ApiModule {
     return retrofit.create(HomeSeerService.class);
   }
 
-  static OkHttpClient.Builder createApiClient(OkHttpClient client, AuthInterceptor authInterceptor) {
+  static OkHttpClient.Builder createApiClient(OkHttpClient client) {
     return client.newBuilder()
-        .addInterceptor(authInterceptor)
         .addNetworkInterceptor(new StethoInterceptor());
   }
 }

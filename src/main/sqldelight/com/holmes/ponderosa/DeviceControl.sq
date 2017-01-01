@@ -1,13 +1,19 @@
+import com.holmes.ponderosa.data.sql.model.DeviceControl;
+
 CREATE TABLE device_control (
   _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   device_ref TEXT NOT NULL,
   label TEXT NOT NULL,
-  type INTEGER NOT NULL,
-  use INTEGER NOT NULL
+  type INTEGER AS DeviceControl.Type NOT NULL,
+  use INTEGER AS DeviceControl.Use NOT NULL
 );
 
 unique_key:
 CREATE UNIQUE INDEX device_control_key ON device_control(device_ref, type, use);
+
+select_all:
+SELECT *
+FROM device_control;
 
 insert_row:
 INSERT OR REPLACE INTO device_control(device_ref, label, type, use)

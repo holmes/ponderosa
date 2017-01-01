@@ -6,6 +6,9 @@ import com.holmes.ponderosa.data.api.HomeSeerService;
 import com.holmes.ponderosa.data.api.Results;
 import com.holmes.ponderosa.data.api.model.HSDevice;
 import com.holmes.ponderosa.data.api.model.HSDeviceControl;
+import com.holmes.ponderosa.data.sql.model.DeviceControl;
+import com.holmes.ponderosa.data.sql.model.DeviceControl.Type;
+import com.holmes.ponderosa.data.sql.model.DeviceControl.Use;
 import com.squareup.sqlbrite.BriteDatabase;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +37,7 @@ public class DataFetcher {
       try (BriteDatabase.Transaction transaction = db.newTransaction()) {
         deviceList.forEach(device -> {
           DeviceModel.Insert_row insertRow = new DeviceModel.Insert_row(db.getWritableDatabase());
-          insertRow.bind(device.ref, device.name, device.location);
+          insertRow.bind(device.ref, device.name, device.location, device.value, device.status, device.status_image);
           db.executeInsert(DeviceModel.TABLE_NAME, insertRow.program);
         });
         transaction.markSuccessful();
@@ -51,8 +54,12 @@ public class DataFetcher {
     deviceControlsResponse.forEach(deviceControlResponse -> {
       try (BriteDatabase.Transaction transaction = db.newTransaction()) {
         deviceControlResponse.forEach(deviceControl -> deviceControl.ControlPairs.forEach(option -> {
-          DeviceControlModel.Insert_row insertRow = new DeviceControlModel.Insert_row(db.getWritableDatabase());
-          insertRow.bind(deviceControl.ref, option.Label, option.ControlType, option.ControlUse);
+          DeviceControlModel.Insert_row insertRow =
+              new DeviceControlModel.Insert_row(db.getWritableDatabase(), DeviceControl.FACTORY);
+
+          insertRow.bind(deviceControl.ref, option.Label, Type.fromValue(option.ControlType),
+              Use.fromValue(option.ControlUse));
+
           db.executeInsert(DeviceControlModel.TABLE_NAME, insertRow.program);
         }));
         transaction.markSuccessful();

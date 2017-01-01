@@ -14,6 +14,9 @@ public interface HomeSeerService {
 
   @GET("JSON?request=getcontrol") //
   Observable<Result<HSDeviceControlResponse>> deviceControls(@Query("ref") List<String> references);
+
+  @GET("JSON?request=controldevicebyvalue") //
+  Observable<Result<HSDevicesResponse>> controlDevice(@Query("ref") String reference, @Query("value") Integer value);
 }
 
 

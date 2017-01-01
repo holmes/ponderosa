@@ -16,16 +16,18 @@ import android.view.ContextThemeWrapper;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.holmes.ponderosa.DeviceControlModel;
 import com.holmes.ponderosa.DeviceModel;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.DataFetcher;
 import com.holmes.ponderosa.data.Injector;
 import com.holmes.ponderosa.data.IntentFactory;
+import com.holmes.ponderosa.data.api.HomeSeerService;
 import com.holmes.ponderosa.data.sql.model.Device;
+import com.holmes.ponderosa.data.sql.model.DeviceControl;
 import com.holmes.ponderosa.ui.misc.BetterViewAnimator;
 import com.holmes.ponderosa.ui.misc.DividerItemDecoration;
 import com.holmes.ponderosa.ui.misc.EnumAdapter;
@@ -36,6 +38,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
@@ -54,6 +57,7 @@ public final class DevicesView extends LinearLayout
   @Inject BriteDatabase db;
   @Inject DataFetcher dataFetcher;
   @Inject Picasso picasso;
+  @Inject HomeSeerService homeSeerService;
   @Inject IntentFactory intentFactory;
   @Inject DrawerLayout drawerLayout;
 
@@ -109,12 +113,18 @@ public final class DevicesView extends LinearLayout
   @Override protected void onAttachedToWindow() {
     super.onAttachedToWindow();
 
-    Observable<List<Device>> query = db.createQuery(DeviceModel.TABLE_NAME, DeviceModel.SELECT_ALL) //
-        .mapToList(Device.SELECT_ALL_MAPPER::map) //
-        .observeOn(AndroidSchedulers.mainThread());
+    Observable<List<Device>> devices =
+        db.createQuery(DeviceModel.TABLE_NAME, DeviceModel.SELECT_ALL).mapToList(Device.SELECT_ALL_MAPPER::map) //
+            .observeOn(AndroidSchedulers.mainThread());
 
-    subscriptions.add(query.subscribe(deviceAdapter));
-    subscriptions.add(query.subscribe(updateViewAction));
+    Observable<List<DeviceControl>> controls =
+        db.createQuery(DeviceControlModel.TABLE_NAME, DeviceControlModel.SELECT_ALL)
+            .mapToList(DeviceControl.SELECT_ALL_MAPPER::map) //
+            .observeOn(AndroidSchedulers.mainThread());
+
+    subscriptions.add(devices.subscribe(updateViewAction));
+    subscriptions.add(devices.subscribe(deviceAdapter::updateDevices));
+    subscriptions.add(controls.subscribe(deviceAdapter::updateControls));
 
     // Load the default selection.
     //onRefresh();
@@ -159,7 +169,11 @@ public final class DevicesView extends LinearLayout
   }
 
   @Override public void onDeviceTapped(Device device) {
-    Toast.makeText(getContext(), "tapped on " + device.name(), Toast.LENGTH_SHORT).show();
+    int newValue = device.value() > 0 ? 0 : 255;
+    homeSeerService.controlDevice(device.ref(), newValue)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(hsDevicesResponseResult -> dataFetcher.refresh());
   }
 
   private boolean safeIsRtl() {

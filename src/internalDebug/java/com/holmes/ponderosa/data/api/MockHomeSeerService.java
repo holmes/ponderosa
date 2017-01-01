@@ -9,16 +9,19 @@ import retrofit2.http.Query;
 import rx.Observable;
 
 public class MockHomeSeerService implements HomeSeerService {
-  @Inject
-  public MockHomeSeerService() {
+  @Inject public MockHomeSeerService() {
   }
 
   @Override public Observable<Result<HSDevicesResponse>> devices() {
     throw new UnsupportedOperationException("implement me!");
   }
 
-  @Override public Observable<Result<HSDeviceControlResponse>> deviceControls(
-      @Query("ref") List<String> references) {
+  @Override public Observable<Result<HSDeviceControlResponse>> deviceControls(@Query("ref") List<String> references) {
+    throw new UnsupportedOperationException("implement me!");
+  }
+
+  @Override
+  public Observable<Result<HSDevicesResponse>> controlDevice(@Query("ref") String reference, @Query("value") Integer value) {
     throw new UnsupportedOperationException("implement me!");
   }
 }
