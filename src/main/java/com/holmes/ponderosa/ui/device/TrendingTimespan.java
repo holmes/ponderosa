@@ -1,4 +1,4 @@
-package com.holmes.ponderosa.ui.trending;
+package com.holmes.ponderosa.ui.device;
 
 import com.holmes.ponderosa.data.api.SearchQuery;
 import org.threeten.bp.LocalDate;

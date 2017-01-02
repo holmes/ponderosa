@@ -1,4 +1,4 @@
-package com.holmes.ponderosa.ui.trending;
+package com.holmes.ponderosa.ui.device;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;

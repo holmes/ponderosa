@@ -1,4 +1,4 @@
-package com.holmes.ponderosa.ui.trending;
+package com.holmes.ponderosa.ui.device;
 
 import android.annotation.TargetApi;
 import android.content.Context;

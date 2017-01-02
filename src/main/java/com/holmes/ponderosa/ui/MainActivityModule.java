@@ -3,7 +3,7 @@ package com.holmes.ponderosa.ui;
 import android.support.v4.widget.DrawerLayout;
 
 import com.holmes.ponderosa.PonderosaModule;
-import com.holmes.ponderosa.ui.trending.DevicesView;
+import com.holmes.ponderosa.ui.device.DevicesView;
 
 import javax.inject.Singleton;
 

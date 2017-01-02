@@ -1,4 +1,4 @@
-package com.holmes.ponderosa.ui.trending;
+package com.holmes.ponderosa.ui.device;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;

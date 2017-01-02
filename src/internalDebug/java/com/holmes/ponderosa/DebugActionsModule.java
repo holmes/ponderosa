@@ -1,8 +1,8 @@
 package com.holmes.ponderosa;
 
 import com.holmes.ponderosa.ui.debug.ContextualDebugActions.DebugAction;
-import com.holmes.ponderosa.ui.trending.ScrollBottomTrendingDebugAction;
-import com.holmes.ponderosa.ui.trending.ScrollTopTrendingDebugAction;
+import com.holmes.ponderosa.ui.device.ScrollBottomTrendingDebugAction;
+import com.holmes.ponderosa.ui.device.ScrollTopTrendingDebugAction;
 import dagger.Module;
 import dagger.Provides;
 import java.util.LinkedHashSet;
