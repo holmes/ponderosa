@@ -74,8 +74,10 @@ final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
     void bindTo(Device device, List<DeviceControl> deviceControls) {
       String title = device.location() + " " + device.name();
       String status = device.status();
+      String statusImage = "https://connected.homeseer.com/" + device.status_image();
 
-      DeviceItemView.DeviceItemViewModel model = new DeviceItemView.DeviceItemViewModel(title, status);
+      DeviceItemView.DeviceItemViewModel model = new DeviceItemView.DeviceItemViewModel(picasso, title, status,
+          statusImage);
       itemView.bindTo(model);
     }
   }

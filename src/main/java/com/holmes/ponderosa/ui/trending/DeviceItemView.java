@@ -10,6 +10,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.ui.transform.CircleStrokeTransformation;
+import com.squareup.picasso.Picasso;
 
 public final class DeviceItemView extends RelativeLayout {
   @BindView(R.id.device_item_status_image) ImageView avatarView;
@@ -32,23 +33,27 @@ public final class DeviceItemView extends RelativeLayout {
   }
 
   public void bindTo(DeviceItemViewModel model) {
-    //picasso.load(device.location())
-    //    .placeholder(R.drawable.avatar)
-    //    .fit()
-    //    .transform(avatarTransformation)
-    //    .into(avatarView);
+    model.picasso.load(model.statusImage)
+        .placeholder(R.drawable.avatar)
+        .fit()
+        .transform(avatarTransformation)
+        .into(avatarView);
 
     nameView.setText(model.title);
     statusView.setText(model.status);
   }
 
-  public static class DeviceItemViewModel {
+  static class DeviceItemViewModel {
+    final Picasso picasso;
     final String title;
     final String status;
+    final String statusImage;
 
-    public DeviceItemViewModel(String title, String status) {
+    public DeviceItemViewModel(Picasso picasso, String title, String status, String statusImage) {
+      this.picasso = picasso;
       this.title = title;
       this.status = status;
+      this.statusImage = statusImage;
     }
   }
 }
