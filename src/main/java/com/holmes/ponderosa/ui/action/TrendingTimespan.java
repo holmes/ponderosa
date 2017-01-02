@@ -1,4 +1,4 @@
-package com.holmes.ponderosa.ui.device;
+package com.holmes.ponderosa.ui.action;
 
 import com.holmes.ponderosa.data.api.SearchQuery;
 import org.threeten.bp.LocalDate;

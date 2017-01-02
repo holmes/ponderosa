@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder> {
+public final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder> {
   public interface DeviceClickListener {
-    void onDeviceTapped(Device repository);
+    void onDeviceTapped(Device device);
   }
 
   private final Picasso picasso;

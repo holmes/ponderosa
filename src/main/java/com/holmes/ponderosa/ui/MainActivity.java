@@ -12,16 +12,17 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Toast;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.Injector;
+import com.holmes.ponderosa.ui.action.ActionsView;
 import dagger.ObjectGraph;
 import javax.inject.Inject;
 
-import static android.widget.Toast.LENGTH_SHORT;
+import static com.holmes.ponderosa.ui.action.ActionsView.PresenterType.DEVICES;
+import static com.holmes.ponderosa.ui.action.ActionsView.PresenterType.EVENTS;
 
 public final class MainActivity extends Activity {
   @BindView(R.id.main_drawer_layout) DrawerLayout drawerLayout;
@@ -53,29 +54,28 @@ public final class MainActivity extends Activity {
     inflater.inflate(R.layout.main_activity, container);
     ButterKnife.bind(this, container);
 
+    ViewGroup view = (ViewGroup) inflater.inflate(R.layout.actions_view, content);
+    ActionsView actionsView = (ActionsView) view.findViewWithTag(ActionsView.TAG);
+
     drawerLayout.setStatusBarBackgroundColor(statusBarColor);
     drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-
     drawer.setNavigationItemSelectedListener(item -> {
       switch (item.getItemId()) {
         case R.id.nav_search:
-          Toast.makeText(MainActivity.this, "Search!", LENGTH_SHORT).show();
+          actionsView.loadPresenter(EVENTS);
           break;
         case R.id.nav_trending:
-          Toast.makeText(MainActivity.this, "Trending!", LENGTH_SHORT).show();
+          actionsView.loadPresenter(DEVICES);
           break;
         default:
           throw new IllegalStateException("Unknown navigation item: " + item.getTitle());
       }
 
       drawerLayout.closeDrawers();
-      // If we supported actual navigation, we would change what was checked and navigate there.
-      //item.setChecked(true);
+      item.setChecked(true);
 
       return true;
     });
-
-    inflater.inflate(R.layout.devices_view, content);
   }
 
   @Override public Object getSystemService(@NonNull String name) {

@@ -21,6 +21,9 @@ public interface HomeSeerService {
 
   @GET("JSON?request=getevents") //
   Observable<Result<HSEventsResponse>> events();
+
+  @GET("JSON?request=runevent") //
+  Observable<Result<HSEventsResponse>> runEvent(@Query("id") Long eventId);
 }
 
 

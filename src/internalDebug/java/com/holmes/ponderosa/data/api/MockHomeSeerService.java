@@ -29,4 +29,8 @@ public class MockHomeSeerService implements HomeSeerService {
   @Override public Observable<Result<HSEventsResponse>> events() {
     throw new UnsupportedOperationException("implement me!");
   }
+
+  @Override public Observable<Result<HSEventsResponse>> runEvent(@Query("id") Long eventId) {
+    throw new UnsupportedOperationException("implement me!");
+  }
 }

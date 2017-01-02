@@ -1,4 +1,4 @@
-package com.holmes.ponderosa.ui.device;
+package com.holmes.ponderosa.ui.action;
 
 import android.content.Context;
 import android.view.LayoutInflater;

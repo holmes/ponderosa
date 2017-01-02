@@ -1,18 +1,19 @@
 package com.holmes.ponderosa.ui;
 
 import android.support.v4.widget.DrawerLayout;
-
 import com.holmes.ponderosa.PonderosaModule;
-import com.holmes.ponderosa.ui.device.DevicesView;
-
-import javax.inject.Singleton;
-
+import com.holmes.ponderosa.ui.action.ActionsView;
+import com.holmes.ponderosa.ui.device.DevicePresenter;
+import com.holmes.ponderosa.ui.event.EventPresenter;
 import dagger.Module;
 import dagger.Provides;
+import javax.inject.Singleton;
 
 @Module(
     addsTo = PonderosaModule.class,
-    injects = DevicesView.class
+    injects = {
+        ActionsView.class, DevicePresenter.class, EventPresenter.class
+    }
 )
 public final class MainActivityModule {
   private final MainActivity mainActivity;

@@ -1,20 +1,21 @@
 package com.holmes.ponderosa.ui.device;
 
+import com.holmes.ponderosa.ui.action.ActionsView;
 import com.holmes.ponderosa.ui.debug.ContextualDebugActions.DebugAction;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-@Singleton public final class ScrollTopTrendingDebugAction extends DebugAction<DevicesView> {
+@Singleton public final class ScrollTopTrendingDebugAction extends DebugAction<ActionsView> {
 
   @Inject public ScrollTopTrendingDebugAction() {
-    super(DevicesView.class);
+    super(ActionsView.class);
   }
 
   @Override public String name() {
     return "Scroll to top";
   }
 
-  @Override public void run(DevicesView view) {
-    view.trendingView.smoothScrollToPosition(0);
+  @Override public void run(ActionsView view) {
+    view.itemsView.smoothScrollToPosition(0);
   }
 }

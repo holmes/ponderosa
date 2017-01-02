@@ -1,9 +1,10 @@
-package com.holmes.ponderosa.ui.device;
+package com.holmes.ponderosa.ui.action;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,37 +20,31 @@ import android.widget.TextView;
 import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.holmes.ponderosa.DeviceControlModel;
-import com.holmes.ponderosa.DeviceModel;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.DataFetcher;
 import com.holmes.ponderosa.data.Injector;
 import com.holmes.ponderosa.data.IntentFactory;
 import com.holmes.ponderosa.data.api.HomeSeerService;
-import com.holmes.ponderosa.data.sql.model.Device;
-import com.holmes.ponderosa.data.sql.model.DeviceControl;
+import com.holmes.ponderosa.ui.device.DevicePresenter;
+import com.holmes.ponderosa.ui.event.EventPresenter;
 import com.holmes.ponderosa.ui.misc.BetterViewAnimator;
 import com.holmes.ponderosa.ui.misc.DividerItemDecoration;
 import com.holmes.ponderosa.ui.misc.EnumAdapter;
 import com.squareup.picasso.Picasso;
 import com.squareup.sqlbrite.BriteDatabase;
-import java.util.List;
 import javax.inject.Inject;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
-import timber.log.Timber;
 
-public final class DevicesView extends LinearLayout
-    implements SwipeRefreshLayout.OnRefreshListener, DeviceAdapter.DeviceClickListener {
+public final class ActionsView extends LinearLayout implements SwipeRefreshLayout.OnRefreshListener {
+  public static String TAG = "ACTIONS_VIEW_TAG";
+
   @BindView(R.id.trending_toolbar) Toolbar toolbarView;
   @BindView(R.id.trending_timespan) Spinner timespanView;
   @BindView(R.id.trending_animator) BetterViewAnimator animatorView;
   @BindView(R.id.trending_swipe_refresh) SwipeRefreshLayout swipeRefreshView;
-  @BindView(R.id.trending_list) RecyclerView trendingView;
+  @BindView(R.id.trending_list) public RecyclerView itemsView;
   @BindView(R.id.trending_loading_message) TextView loadingMessageView;
 
   @BindDimen(R.dimen.trending_divider_padding_start) float dividerPaddingStart;
@@ -61,29 +56,35 @@ public final class DevicesView extends LinearLayout
   @Inject IntentFactory intentFactory;
   @Inject DrawerLayout drawerLayout;
 
+  @Inject DevicePresenter devicePresenter;
+  @Inject EventPresenter eventPresenter;
+  private ActionPresenter currentPresenter;
+  @NonNull private CompositeSubscription subscriptions = new CompositeSubscription();
+
   private final PublishSubject<TrendingTimespan> timespanSubject;
   private final EnumAdapter<TrendingTimespan> timespanAdapter;
-  private final DeviceAdapter deviceAdapter;
-  private final CompositeSubscription subscriptions = new CompositeSubscription();
 
-  private Action1<List<Device>> updateViewAction = devices -> {
-    Timber.d("why the fuxk doesn't this work?");
-    animatorView.setDisplayedChildId(devices.isEmpty() //
+  private Action1<Integer> updateViewAction = count -> {
+    animatorView.setDisplayedChildId(count == 0 //
         ? R.id.trending_empty //
         : R.id.trending_swipe_refresh);
     swipeRefreshView.setRefreshing(false);
   };
 
-  public DevicesView(Context context, AttributeSet attrs) {
+  public enum PresenterType {
+    DEVICES, EVENTS
+  }
+
+  public ActionsView(Context context, AttributeSet attrs) {
     super(context, attrs);
     if (!isInEditMode()) {
       Injector.obtain(context).inject(this);
     }
 
+    setTag(TAG);
     timespanSubject = PublishSubject.create();
     timespanAdapter =
         new TrendingTimespanAdapter(new ContextThemeWrapper(getContext(), R.style.Theme_U2020_TrendingTimespan));
-    deviceAdapter = new DeviceAdapter(picasso, this);
   }
 
   @Override protected void onFinishInflate() {
@@ -104,30 +105,34 @@ public final class DevicesView extends LinearLayout
     swipeRefreshView.setColorSchemeResources(R.color.accent);
     swipeRefreshView.setOnRefreshListener(this);
 
-    trendingView.setLayoutManager(new LinearLayoutManager(getContext()));
-    trendingView.addItemDecoration(
+    itemsView.setLayoutManager(new LinearLayoutManager(getContext()));
+    itemsView.addItemDecoration(
         new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, dividerPaddingStart, safeIsRtl()));
-    trendingView.setAdapter(deviceAdapter);
+
+    // TODO load last one seen?
+    loadPresenter(PresenterType.DEVICES);
+  }
+
+  public void loadPresenter(PresenterType type) {
+    subscriptions.unsubscribe();
+    subscriptions = new CompositeSubscription();
+
+    switch (type) {
+      case DEVICES:
+        currentPresenter = devicePresenter;
+        break;
+      case EVENTS:
+        currentPresenter = eventPresenter;
+        break;
+    }
+
+    itemsView.setAdapter(currentPresenter.getAdapter());
+    subscriptions.add(currentPresenter.loadData(updateViewAction));
   }
 
   @Override protected void onAttachedToWindow() {
     super.onAttachedToWindow();
-
-    Observable<List<Device>> devices =
-        db.createQuery(DeviceModel.TABLE_NAME, DeviceModel.SELECT_ALL).mapToList(Device.SELECT_ALL_MAPPER::map) //
-            .observeOn(AndroidSchedulers.mainThread());
-
-    Observable<List<DeviceControl>> controls =
-        db.createQuery(DeviceControlModel.TABLE_NAME, DeviceControlModel.SELECT_ALL)
-            .mapToList(DeviceControl.SELECT_ALL_MAPPER::map) //
-            .observeOn(AndroidSchedulers.mainThread());
-
-    subscriptions.add(devices.subscribe(updateViewAction));
-    subscriptions.add(devices.subscribe(deviceAdapter::updateDevices));
-    subscriptions.add(controls.subscribe(deviceAdapter::updateControls));
-
-    // Load the default selection.
-    //onRefresh();
+    subscriptions.add(currentPresenter.loadData(updateViewAction));
   }
 
   //private final Action1<Result<HSDevicesResponse>> trendingError = new Action1<Result<HSDevicesResponse>>() {
@@ -157,7 +162,6 @@ public final class DevicesView extends LinearLayout
     // For whatever reason, the SRL's spinner does not draw itself when we call setRefreshing(true)
     // unless it is posted.
     post(() -> {
-      Timber.d("Setting refresh to true");
       swipeRefreshView.setRefreshing(true);
       dataFetcher.refresh();
       //timespanSubject.onNext(timespanAdapter.getItem(position));
@@ -166,14 +170,6 @@ public final class DevicesView extends LinearLayout
 
   @Override public void onRefresh() {
     timespanSelected(timespanView.getSelectedItemPosition());
-  }
-
-  @Override public void onDeviceTapped(Device device) {
-    int newValue = device.value() > 0 ? 0 : 255;
-    homeSeerService.controlDevice(device.ref(), newValue)
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(hsDevicesResponseResult -> dataFetcher.refresh());
   }
 
   private boolean safeIsRtl() {
