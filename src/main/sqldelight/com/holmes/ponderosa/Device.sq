@@ -1,8 +1,12 @@
+import com.holmes.ponderosa.data.sql.model.Device;
+
 CREATE TABLE devices (
   ref TEXT NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   location TEXT NOT NULL,
   value INTEGER NOT NULL,
+  device_type INTEGER AS Device.Type NOT NULL,
+  device_subtype INTEGER NOT NULL,
   status TEXT NOT NULL,
   status_image TEXT NOT NULL
 );
@@ -12,6 +16,6 @@ SELECT *
 FROM devices;
 
 insert_row:
-INSERT OR REPLACE INTO devices(ref, name, location, value, status, status_image)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO devices(ref, name, location, value, device_type, device_subtype, status, status_image)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 

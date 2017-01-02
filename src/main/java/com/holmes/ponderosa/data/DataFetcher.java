@@ -6,6 +6,7 @@ import com.holmes.ponderosa.data.api.HomeSeerService;
 import com.holmes.ponderosa.data.api.Results;
 import com.holmes.ponderosa.data.api.model.HSDevice;
 import com.holmes.ponderosa.data.api.model.HSDeviceControl;
+import com.holmes.ponderosa.data.sql.model.Device;
 import com.holmes.ponderosa.data.sql.model.DeviceControl;
 import com.holmes.ponderosa.data.sql.model.DeviceControl.Type;
 import com.holmes.ponderosa.data.sql.model.DeviceControl.Use;
@@ -36,8 +37,10 @@ public class DataFetcher {
     devices.forEach(deviceList -> {
       try (BriteDatabase.Transaction transaction = db.newTransaction()) {
         deviceList.forEach(device -> {
-          DeviceModel.Insert_row insertRow = new DeviceModel.Insert_row(db.getWritableDatabase());
-          insertRow.bind(device.ref, device.name, device.location, device.value, device.status, device.status_image);
+          DeviceModel.Insert_row insertRow = new DeviceModel.Insert_row(db.getWritableDatabase(), Device.FACTORY);
+          Device.Type type = Device.Type.fromValue(device.device_type.Device_API);
+          insertRow.bind(device.ref, device.name, device.location, device.value, type,
+              device.device_type.Device_SubType, device.status, device.status_image);
           db.executeInsert(DeviceModel.TABLE_NAME, insertRow.program);
         });
         transaction.markSuccessful();

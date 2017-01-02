@@ -27,14 +27,8 @@ import com.squareup.sqldelight.RowMapper;
     }
   };
 
-  public static final Factory<DeviceControl> FACTORY = new Factory<DeviceControl>(new Creator<DeviceControl>() {
-    @Override
-    public DeviceControl create(long _id, @NonNull String device_ref, @NonNull String label, @NonNull Type type,
-        @NonNull Use use) {
-      return new AutoValue_DeviceControl(_id, device_ref, label, type, use);
-    }
-  }, TYPE_ADAPTER, USE_ADAPTER);
-
+  public static final Factory<DeviceControl> FACTORY =
+      new Factory<>(AutoValue_DeviceControl::new, TYPE_ADAPTER, USE_ADAPTER);
   public static final RowMapper<DeviceControl> SELECT_ALL_MAPPER = FACTORY.select_allMapper();
 
   public enum Type {
