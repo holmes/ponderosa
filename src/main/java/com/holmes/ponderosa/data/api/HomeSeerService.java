@@ -2,6 +2,7 @@ package com.holmes.ponderosa.data.api;
 
 import com.holmes.ponderosa.data.api.model.HSDeviceControlResponse;
 import com.holmes.ponderosa.data.api.model.HSDevicesResponse;
+import com.holmes.ponderosa.data.api.model.HSEventsResponse;
 import java.util.List;
 import retrofit2.adapter.rxjava.Result;
 import retrofit2.http.GET;
@@ -17,6 +18,9 @@ public interface HomeSeerService {
 
   @GET("JSON?request=controldevicebyvalue") //
   Observable<Result<HSDevicesResponse>> controlDevice(@Query("ref") String reference, @Query("value") Integer value);
+
+  @GET("JSON?request=getevents") //
+  Observable<Result<HSEventsResponse>> events();
 }
 
 

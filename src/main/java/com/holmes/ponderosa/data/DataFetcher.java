@@ -2,6 +2,7 @@ package com.holmes.ponderosa.data;
 
 import com.holmes.ponderosa.DeviceControlModel;
 import com.holmes.ponderosa.DeviceModel;
+import com.holmes.ponderosa.EventModel;
 import com.holmes.ponderosa.data.api.HomeSeerService;
 import com.holmes.ponderosa.data.api.Results;
 import com.holmes.ponderosa.data.api.model.HSDevice;
@@ -70,5 +71,20 @@ public class DataFetcher {
     });
 
     devices.connect();
+
+    homeSeerService.events()
+        .subscribeOn(Schedulers.io())
+        .filter(Results.isSuccessful())
+        .map(hsEventsResponseResult -> hsEventsResponseResult.response().body().Events)
+        .forEach(hsEvents -> {
+          try (BriteDatabase.Transaction transaction = db.newTransaction()) {
+            hsEvents.forEach(hsEvent -> {
+              EventModel.Insert_row insertRow = new EventModel.Insert_row(db.getWritableDatabase());
+              insertRow.bind(hsEvent.id, hsEvent.Group, hsEvent.Name);
+              db.executeInsert(EventModel.TABLE_NAME, insertRow.program);
+            });
+            transaction.markSuccessful();
+          }
+        });
   }
 }
