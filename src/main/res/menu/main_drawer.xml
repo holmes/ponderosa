@@ -12,5 +12,10 @@
         android:title="@string/nav_drawer_event"
         android:icon="@drawable/nav_search"
         />
+    <item
+        android:id="@+id/nav_credentials"
+        android:title="@string/nav_drawer_credentials"
+        android:icon="@drawable/nav_search"
+        />
   </group>
 </menu>

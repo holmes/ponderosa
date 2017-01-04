@@ -17,4 +17,10 @@
   <string name="loading_message">loading</string>
   <string name="nav_drawer_device">Devices</string>
   <string name="nav_drawer_event">Events</string>
+  <string name="nav_drawer_credentials">Login</string>
+  <string name="username">Username</string>
+  <string name="password">Password</string>
+  <string name="cancel">Cancel</string>
+  <string name="save">Save</string>
+  <string name="sign_in_title">Enter your HomeSeer Login</string>
 </resources>

@@ -6,6 +6,7 @@ import com.facebook.stetho.Stetho;
 import com.holmes.ponderosa.data.DataFetcher;
 import com.holmes.ponderosa.data.Injector;
 import com.holmes.ponderosa.data.LumberYard;
+import com.holmes.ponderosa.data.api.auth.CredentialManager;
 import com.holmes.ponderosa.ui.ActivityHierarchyServer;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.squareup.leakcanary.LeakCanary;
@@ -21,6 +22,7 @@ public final class PonderosaApp extends Application {
   @Inject ActivityHierarchyServer activityHierarchyServer;
   @Inject LumberYard lumberYard;
   @Inject DataFetcher dataFetcher;
+  @Inject CredentialManager credentialManager;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -41,6 +43,7 @@ public final class PonderosaApp extends Application {
     lumberYard.cleanUp();
     Timber.plant(lumberYard.tree());
 
+    credentialManager.initialize();
     dataFetcher.refresh();
 
     registerActivityLifecycleCallbacks(activityHierarchyServer);

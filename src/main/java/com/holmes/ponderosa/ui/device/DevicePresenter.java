@@ -40,11 +40,13 @@ public final class DevicePresenter implements ActionPresenter, DeviceAdapter.Dev
   @Override public Subscription loadData(Action1<Integer> countAction) {
     Observable<List<Device>> devices =
         db.createQuery(DeviceModel.TABLE_NAME, DeviceModel.SELECT_ALL).mapToList(Device.SELECT_ALL_MAPPER::map) //
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread());
 
     Observable<List<DeviceControl>> controls =
         db.createQuery(DeviceControlModel.TABLE_NAME, DeviceControlModel.SELECT_ALL)
             .mapToList(DeviceControl.SELECT_ALL_MAPPER::map) //
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread());
 
     CompositeSubscription subscriptions = new CompositeSubscription();

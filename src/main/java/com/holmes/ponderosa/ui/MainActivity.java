@@ -2,6 +2,7 @@ package com.holmes.ponderosa.ui;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,11 +13,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.TextView;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.Injector;
+import com.holmes.ponderosa.data.api.auth.CredentialManager;
 import com.holmes.ponderosa.ui.action.ActionsView;
 import dagger.ObjectGraph;
 import javax.inject.Inject;
@@ -28,9 +31,9 @@ public final class MainActivity extends Activity {
   @BindView(R.id.main_drawer_layout) DrawerLayout drawerLayout;
   @BindView(R.id.main_navigation) NavigationView drawer;
   @BindView(R.id.main_content) ViewGroup content;
-
   @BindColor(R.color.status_bar) int statusBarColor;
 
+  @Inject CredentialManager credentialManager;
   @Inject ViewContainer viewContainer;
 
   private ObjectGraph activityGraph;
@@ -67,6 +70,9 @@ public final class MainActivity extends Activity {
         case R.id.nav_trending:
           actionsView.loadPresenter(DEVICES);
           break;
+        case R.id.nav_credentials:
+          signIn();
+          return true;
         default:
           throw new IllegalStateException("Unknown navigation item: " + item.getTitle());
       }
@@ -76,6 +82,21 @@ public final class MainActivity extends Activity {
 
       return true;
     });
+  }
+
+  private void signIn() {
+    ViewGroup dialogView = (ViewGroup) LayoutInflater.from(this).inflate(R.layout.dialog_sign_in, null);
+
+    new AlertDialog.Builder(this)
+        .setView(dialogView) //
+        .setTitle(R.string.sign_in_title)
+        .setPositiveButton(R.string.save, (dialog, which) -> {
+          String username = ((TextView) dialogView.findViewById(R.id.sign_in_username)).getText().toString();
+          String password = ((TextView) dialogView.findViewById(R.id.sign_in_password)).getText().toString();
+          credentialManager.save(username, password);
+          drawerLayout.closeDrawers();
+        }).setNegativeButton(R.string.cancel, (dialog, which) -> drawerLayout.closeDrawers()) //
+        .show();
   }
 
   @Override public Object getSystemService(@NonNull String name) {
@@ -90,8 +111,7 @@ public final class MainActivity extends Activity {
     super.onDestroy();
   }
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  private static void setStatusBarColor(Window window) {
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP) private static void setStatusBarColor(Window window) {
     window.setStatusBarColor(Color.TRANSPARENT);
   }
 }

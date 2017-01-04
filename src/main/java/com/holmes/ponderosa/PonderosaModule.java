@@ -2,8 +2,10 @@ package com.holmes.ponderosa;
 
 import android.app.Application;
 import com.holmes.ponderosa.data.DataModule;
+import com.holmes.ponderosa.data.api.auth.CredentialManager;
 import com.holmes.ponderosa.data.sql.SQLModule;
 import com.holmes.ponderosa.ui.UiModule;
+import com.squareup.moshi.Moshi;
 import dagger.Module;
 import dagger.Provides;
 import javax.inject.Singleton;
@@ -27,5 +29,9 @@ public final class PonderosaModule {
 
   @Provides @Singleton Application provideApplication() {
     return app;
+  }
+
+  @Provides @Singleton CredentialManager provideCredentialManager(Application application, Moshi moshi) {
+    return new CredentialManager(application, moshi);
   }
 }
