@@ -1,6 +1,5 @@
 package com.holmes.ponderosa.ui.device;
 
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -11,7 +10,6 @@ import com.squareup.picasso.Picasso;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder> {
@@ -33,14 +31,9 @@ public final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.View
 
   public void updateDevices(List<Device> devices) {
     this.devices = devices.stream() //
-        .filter(allowableDevices()) //
+        .filter(DeviceFilters.allowableDevices()) //
         .collect(Collectors.toList());
     notifyDataSetChanged();
-  }
-
-  @NonNull private Predicate<Device> allowableDevices() {
-    // TODO all we handle are lights for now.
-    return device -> (device.device_type() == Device.Type.PLUG_IN && device.device_subtype() == 17);
   }
 
   public void updateControls(List<DeviceControl> controls) {

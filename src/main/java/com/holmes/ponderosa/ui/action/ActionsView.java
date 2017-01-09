@@ -20,6 +20,7 @@ import android.widget.TextView;
 import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnItemSelected;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.DataFetcher;
 import com.holmes.ponderosa.data.Injector;
@@ -29,7 +30,6 @@ import com.holmes.ponderosa.ui.device.DevicePresenter;
 import com.holmes.ponderosa.ui.event.EventPresenter;
 import com.holmes.ponderosa.ui.misc.BetterViewAnimator;
 import com.holmes.ponderosa.ui.misc.DividerItemDecoration;
-import com.holmes.ponderosa.ui.misc.EnumAdapter;
 import com.squareup.picasso.Picasso;
 import com.squareup.sqlbrite.BriteDatabase;
 import javax.inject.Inject;
@@ -41,7 +41,8 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
   public static String TAG = "ACTIONS_VIEW_TAG";
 
   @BindView(R.id.trending_toolbar) Toolbar toolbarView;
-  @BindView(R.id.trending_timespan) Spinner timespanView;
+  @BindView(R.id.action_title) TextView actionTitle;
+  @BindView(R.id.action_filter) Spinner filterView;
   @BindView(R.id.trending_animator) BetterViewAnimator animatorView;
   @BindView(R.id.trending_swipe_refresh) SwipeRefreshLayout swipeRefreshView;
   @BindView(R.id.trending_list) public RecyclerView itemsView;
@@ -61,8 +62,8 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
   private ActionPresenter currentPresenter;
   @NonNull private CompositeSubscription subscriptions = new CompositeSubscription();
 
-  private final PublishSubject<TrendingTimespan> timespanSubject;
-  private final EnumAdapter<TrendingTimespan> timespanAdapter;
+  private final PublishSubject<String> filterSubject;
+  private final FilterAdapter filterAdapter;
 
   private Action1<Integer> updateViewAction = count -> {
     animatorView.setDisplayedChildId(count == 0 //
@@ -82,9 +83,9 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
     }
 
     setTag(TAG);
-    timespanSubject = PublishSubject.create();
-    timespanAdapter =
-        new TrendingTimespanAdapter(new ContextThemeWrapper(getContext(), R.style.Theme_U2020_TrendingTimespan));
+
+    filterSubject = PublishSubject.create();
+    filterAdapter = new FilterAdapter(new ContextThemeWrapper(getContext(), R.style.Theme_U2020_TrendingTimespan));
   }
 
   @Override protected void onFinishInflate() {
@@ -99,8 +100,8 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
     toolbarView.setNavigationIcon(R.drawable.menu_icon);
     toolbarView.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
-    timespanView.setAdapter(timespanAdapter);
-    timespanView.setSelection(TrendingTimespan.WEEK.ordinal());
+    filterView.setAdapter(filterAdapter);
+    filterView.setSelection(0);
 
     swipeRefreshView.setColorSchemeResources(R.color.accent);
     swipeRefreshView.setOnRefreshListener(this);
@@ -126,13 +127,16 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
         break;
     }
 
+    actionTitle.setText(currentPresenter.getActionTitle());
     itemsView.setAdapter(currentPresenter.getAdapter());
-    subscriptions.add(currentPresenter.loadData(updateViewAction));
+
+    subscriptions.add(currentPresenter.loadData(filterSubject, updateViewAction));
+    subscriptions.add(currentPresenter.getFilterOptions().subscribe(filterAdapter::update));
   }
 
   @Override protected void onAttachedToWindow() {
     super.onAttachedToWindow();
-    subscriptions.add(currentPresenter.loadData(updateViewAction));
+    subscriptions.add(currentPresenter.loadData(filterSubject, updateViewAction));
   }
 
   //private final Action1<Result<HSDevicesResponse>> trendingError = new Action1<Result<HSDevicesResponse>>() {
@@ -153,7 +157,7 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
     subscriptions.unsubscribe();
   }
 
-  //@OnItemSelected(R.id.trending_timespan)
+  @OnItemSelected(R.id.action_filter)
   void timespanSelected(final int position) {
     if (animatorView.getDisplayedChildId() != R.id.trending_swipe_refresh) {
       animatorView.setDisplayedChildId(R.id.trending_loading);
@@ -164,12 +168,12 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
     post(() -> {
       swipeRefreshView.setRefreshing(true);
       dataFetcher.refresh();
-      //timespanSubject.onNext(timespanAdapter.getItem(position));
+      filterSubject.onNext(filterAdapter.getItem(position));
     });
   }
 
   @Override public void onRefresh() {
-    timespanSelected(timespanView.getSelectedItemPosition());
+    timespanSelected(filterView.getSelectedItemPosition());
   }
 
   private boolean safeIsRtl() {

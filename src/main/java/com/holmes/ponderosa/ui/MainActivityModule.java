@@ -1,5 +1,7 @@
 package com.holmes.ponderosa.ui;
 
+import android.app.Application;
+import android.content.res.Resources;
 import android.support.v4.widget.DrawerLayout;
 import com.holmes.ponderosa.PonderosaModule;
 import com.holmes.ponderosa.ui.action.ActionsView;
@@ -20,6 +22,10 @@ public final class MainActivityModule {
 
   MainActivityModule(MainActivity mainActivity) {
     this.mainActivity = mainActivity;
+  }
+
+  @Provides @Singleton Resources provideResources(Application application) {
+    return application.getResources();
   }
 
   @Provides @Singleton DrawerLayout provideDrawerLayout() {
