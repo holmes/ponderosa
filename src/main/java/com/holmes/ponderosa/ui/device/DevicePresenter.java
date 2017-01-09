@@ -12,17 +12,18 @@ import com.holmes.ponderosa.data.sql.model.DeviceControl;
 import com.holmes.ponderosa.ui.action.ActionPresenter;
 import com.squareup.picasso.Picasso;
 import com.squareup.sqlbrite.BriteDatabase;
+import hu.akarnokd.rxjava.interop.RxJavaInterop;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 import static java.util.stream.Collectors.toList;
 
@@ -45,14 +46,17 @@ import static java.util.stream.Collectors.toList;
     this.homeSeerService = homeSeerService;
     this.deviceAdapter = new DeviceAdapter(this.picasso, this);
 
-    devices = db.createQuery(DeviceModel.TABLE_NAME, DeviceModel.SELECT_ALL) //
-        .mapToList(Device.SELECT_ALL_MAPPER::map) //
+    devices = RxJavaInterop.toV2Observable( //
+        db.createQuery(DeviceModel.TABLE_NAME, DeviceModel.SELECT_ALL) //
+        .mapToList(Device.SELECT_ALL_MAPPER::map)) //
         .subscribeOn(Schedulers.io()) //
         .observeOn(AndroidSchedulers.mainThread());
 
-    controls = db.createQuery(DeviceControlModel.TABLE_NAME, DeviceControlModel.SELECT_ALL) //
-        .mapToList(DeviceControl.SELECT_ALL_MAPPER::map) //
-        .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    controls = RxJavaInterop.toV2Observable( //
+        db.createQuery(DeviceControlModel.TABLE_NAME, DeviceControlModel.SELECT_ALL) //
+        .mapToList(DeviceControl.SELECT_ALL_MAPPER::map)) //
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread());
 
     filters = devices.map((foundDevices) -> foundDevices.stream() //
         .filter(DeviceFilters.allowableDevices()).map(Device::location) //
@@ -64,8 +68,8 @@ import static java.util.stream.Collectors.toList;
         });
   }
 
-  @Override public Subscription loadData(Observable<String> selectedFilter, Action1<Integer> countAction) {
-    Subscription adapterSubscription = Observable.combineLatest(devices, selectedFilter, //
+  @Override public Disposable loadData(Observable<String> selectedFilter, Consumer<Integer> countAction) {
+    Disposable adapterSubscription = Observable.combineLatest(devices, selectedFilter, //
         (devices1, location) -> devices1.stream() //
             .filter(device -> { //
               String allTitle = resources.getString(R.string.devices_filter_all); //
@@ -74,7 +78,7 @@ import static java.util.stream.Collectors.toList;
             .collect(Collectors.toList())) //
         .subscribe(deviceAdapter::updateDevices);
 
-    CompositeSubscription subscriptions = new CompositeSubscription();
+    CompositeDisposable subscriptions = new CompositeDisposable();
     subscriptions.add(adapterSubscription);
     subscriptions.add(controls.subscribe(deviceAdapter::updateControls));
     subscriptions.add(devices.map(List::size).subscribe(countAction));

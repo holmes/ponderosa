@@ -3,7 +3,7 @@ package com.holmes.ponderosa.data.prefs;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.f2prateek.rx.preferences.Preference;
+import com.f2prateek.rx.preferences2.Preference;
 import com.holmes.ponderosa.util.Strings;
 import java.net.InetSocketAddress;
 import java.net.Proxy;

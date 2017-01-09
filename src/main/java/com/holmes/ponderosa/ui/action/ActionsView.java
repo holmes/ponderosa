@@ -32,10 +32,10 @@ import com.holmes.ponderosa.ui.misc.BetterViewAnimator;
 import com.holmes.ponderosa.ui.misc.DividerItemDecoration;
 import com.squareup.picasso.Picasso;
 import com.squareup.sqlbrite.BriteDatabase;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.subjects.PublishSubject;
 import javax.inject.Inject;
-import rx.functions.Action1;
-import rx.subjects.PublishSubject;
-import rx.subscriptions.CompositeSubscription;
 
 public final class ActionsView extends LinearLayout implements SwipeRefreshLayout.OnRefreshListener {
   public static String TAG = "ACTIONS_VIEW_TAG";
@@ -60,12 +60,12 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
   @Inject DevicePresenter devicePresenter;
   @Inject EventPresenter eventPresenter;
   private ActionPresenter currentPresenter;
-  @NonNull private CompositeSubscription subscriptions = new CompositeSubscription();
+  @NonNull private CompositeDisposable subscriptions = new CompositeDisposable();
 
   private final PublishSubject<String> filterSubject;
   private final FilterAdapter filterAdapter;
 
-  private Action1<Integer> updateViewAction = count -> {
+  private Consumer<Integer> updateViewAction = count -> {
     animatorView.setDisplayedChildId(count == 0 //
         ? R.id.trending_empty //
         : R.id.trending_swipe_refresh);
@@ -115,8 +115,8 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
   }
 
   public void loadPresenter(PresenterType type) {
-    subscriptions.unsubscribe();
-    subscriptions = new CompositeSubscription();
+    subscriptions.dispose();
+    subscriptions = new CompositeDisposable();
 
     switch (type) {
       case DEVICES:
@@ -154,7 +154,7 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
 
   @Override protected void onDetachedFromWindow() {
     super.onDetachedFromWindow();
-    subscriptions.unsubscribe();
+    subscriptions.dispose();
   }
 
   @OnItemSelected(R.id.action_filter)

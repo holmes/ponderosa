@@ -1,8 +1,7 @@
 package com.holmes.ponderosa.data;
 
 import android.content.Intent;
-import com.f2prateek.rx.preferences.Preference;
-import com.holmes.ponderosa.data.IntentFactory;
+import com.f2prateek.rx.preferences2.Preference;
 import com.holmes.ponderosa.ui.ExternalIntentActivity;
 
 /**

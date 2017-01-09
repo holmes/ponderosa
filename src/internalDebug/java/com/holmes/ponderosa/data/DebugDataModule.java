@@ -2,13 +2,13 @@ package com.holmes.ponderosa.data;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import com.f2prateek.rx.preferences.Preference;
-import com.f2prateek.rx.preferences.RxSharedPreferences;
-import com.holmes.ponderosa.data.api.auth.AuthInterceptor;
-import com.jakewharton.picasso.OkHttp3Downloader;
+import com.f2prateek.rx.preferences2.Preference;
+import com.f2prateek.rx.preferences2.RxSharedPreferences;
 import com.holmes.ponderosa.IsInstrumentationTest;
 import com.holmes.ponderosa.data.api.DebugApiModule;
+import com.holmes.ponderosa.data.api.auth.AuthInterceptor;
 import com.holmes.ponderosa.data.prefs.InetSocketAddressPreferenceAdapter;
+import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 import dagger.Module;
 import dagger.Provides;

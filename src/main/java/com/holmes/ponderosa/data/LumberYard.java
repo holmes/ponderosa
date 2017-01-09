@@ -3,6 +3,10 @@ package com.holmes.ponderosa.data;
 import android.app.Application;
 import android.os.AsyncTask;
 import android.util.Log;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.subjects.PublishSubject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -14,9 +18,6 @@ import javax.inject.Singleton;
 import okio.BufferedSink;
 import okio.Okio;
 import org.threeten.bp.LocalDateTime;
-import rx.Observable;
-import rx.Subscriber;
-import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 import static org.threeten.bp.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -61,8 +62,8 @@ public final class LumberYard {
 
   /**  Save the current logs to disk. */
   public Observable<File> save() {
-    return Observable.create(new Observable.OnSubscribe<File>() {
-      @Override public void call(Subscriber<? super File> subscriber) {
+   return Observable.create(new ObservableOnSubscribe<File>() {
+      @Override public void subscribe(ObservableEmitter<File> subscriber) throws Exception {
         File folder = app.getExternalFilesDir(null);
         if (folder == null) {
           subscriber.onError(new IOException("External storage is not mounted."));
@@ -85,7 +86,7 @@ public final class LumberYard {
           sink = null;
 
           subscriber.onNext(output);
-          subscriber.onCompleted();
+          subscriber.onComplete();
         } catch (IOException e) {
           subscriber.onError(e);
         } finally {
@@ -97,6 +98,7 @@ public final class LumberYard {
             }
           }
         }
+
       }
     });
   }

@@ -8,17 +8,15 @@ import android.widget.ListView;
 import android.widget.Toast;
 import com.holmes.ponderosa.data.LumberYard;
 import com.holmes.ponderosa.util.Intents;
-import java.io.File;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public final class LogsDialog extends AlertDialog {
   private final LumberYard lumberYard;
   private final LogAdapter adapter;
 
-  private CompositeSubscription subscriptions;
+  private CompositeDisposable subscriptions;
 
   public LogsDialog(Context context, LumberYard lumberYard) {
     super(context);
@@ -45,7 +43,7 @@ public final class LogsDialog extends AlertDialog {
 
     adapter.setLogs(lumberYard.bufferedLogs());
 
-    subscriptions = new CompositeSubscription();
+    subscriptions = new CompositeDisposable();
     subscriptions.add(lumberYard.logs() //
         .observeOn(AndroidSchedulers.mainThread()) //
         .subscribe(adapter));
@@ -53,29 +51,20 @@ public final class LogsDialog extends AlertDialog {
 
   @Override protected void onStop() {
     super.onStop();
-    subscriptions.unsubscribe();
+    subscriptions.dispose();
   }
 
   private void share() {
     lumberYard.save() //
         .subscribeOn(Schedulers.io()) //
         .observeOn(AndroidSchedulers.mainThread()) //
-        .subscribe(new Subscriber<File>() {
-          @Override public void onCompleted() {
-            // NO-OP.
-          }
-
-          @Override public void onError(Throwable e) {
-            Toast.makeText(getContext(), "Couldn't save the logs for sharing.", Toast.LENGTH_SHORT)
-                .show();
-          }
-
-          @Override public void onNext(File file) {
+        .subscribe(file -> {
             Intent sendIntent = new Intent(Intent.ACTION_SEND);
             sendIntent.setType("text/plain");
             sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
             Intents.maybeStartChooser(getContext(), sendIntent);
-          }
+        }, throwable -> {
+          Toast.makeText(getContext(), "Couldn't save the logs for sharing.", Toast.LENGTH_SHORT).show();
         });
   }
 }

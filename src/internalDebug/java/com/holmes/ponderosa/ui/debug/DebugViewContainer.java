@@ -11,9 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.f2prateek.rx.preferences.Preference;
-import com.jakewharton.madge.MadgeFrameLayout;
-import com.jakewharton.scalpel.ScalpelFrameLayout;
+import com.f2prateek.rx.preferences2.Preference;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.LumberYard;
 import com.holmes.ponderosa.data.PixelGridEnabled;
@@ -24,10 +22,12 @@ import com.holmes.ponderosa.data.SeenDebugDrawer;
 import com.holmes.ponderosa.ui.ViewContainer;
 import com.holmes.ponderosa.ui.bugreport.BugReportLens;
 import com.holmes.ponderosa.util.EmptyActivityLifecycleCallbacks;
+import com.jakewharton.madge.MadgeFrameLayout;
+import com.jakewharton.scalpel.ScalpelFrameLayout;
 import com.mattprecious.telescope.TelescopeLayout;
+import io.reactivex.disposables.CompositeDisposable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import rx.subscriptions.CompositeSubscription;
 
 import static android.content.Context.POWER_SERVICE;
 import static android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP;
@@ -105,7 +105,7 @@ public final class DebugViewContainer implements ViewContainer {
       seenDebugDrawer.set(true);
     }
 
-    final CompositeSubscription subscriptions = new CompositeSubscription();
+    CompositeDisposable subscriptions = new CompositeDisposable();
     setupMadge(viewHolder, subscriptions);
     setupScalpel(viewHolder, subscriptions);
 
@@ -113,7 +113,7 @@ public final class DebugViewContainer implements ViewContainer {
     app.registerActivityLifecycleCallbacks(new EmptyActivityLifecycleCallbacks() {
       @Override public void onActivityDestroyed(Activity lifecycleActivity) {
         if (lifecycleActivity == activity) {
-          subscriptions.unsubscribe();
+          subscriptions.dispose();
           app.unregisterActivityLifecycleCallbacks(this);
         }
       }
@@ -123,7 +123,7 @@ public final class DebugViewContainer implements ViewContainer {
     return viewHolder.content;
   }
 
-  private void setupMadge(final ViewHolder viewHolder, CompositeSubscription subscriptions) {
+  private void setupMadge(final ViewHolder viewHolder, CompositeDisposable subscriptions) {
     subscriptions.add(pixelGridEnabled.asObservable().subscribe(enabled -> {
       viewHolder.madgeFrameLayout.setOverlayEnabled(enabled);
     }));
@@ -132,7 +132,7 @@ public final class DebugViewContainer implements ViewContainer {
     }));
   }
 
-  private void setupScalpel(final ViewHolder viewHolder, CompositeSubscription subscriptions) {
+  private void setupScalpel(final ViewHolder viewHolder, CompositeDisposable subscriptions) {
     subscriptions.add(scalpelEnabled.asObservable().subscribe(enabled -> {
       viewHolder.content.setLayerInteractionEnabled(enabled);
     }));

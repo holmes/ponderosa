@@ -1,13 +1,13 @@
 package com.holmes.ponderosa.data.api;
 
-import retrofit2.adapter.rxjava.Result;
-import rx.functions.Func1;
+import com.jakewharton.retrofit2.adapter.rxjava2.Result;
+import io.reactivex.functions.Predicate;
 
 public final class Results {
-  private static final Func1<Result<?>, Boolean> SUCCESSFUL =
+  private static final Predicate<Result> SUCCESSFUL =
           result -> !result.isError() && result.response().isSuccessful();
 
-  public static Func1<Result<?>, Boolean> isSuccessful() {
+  public static Predicate<Result> isSuccessful() {
     return SUCCESSFUL;
   }
 

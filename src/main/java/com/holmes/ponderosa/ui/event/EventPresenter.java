@@ -10,17 +10,18 @@ import com.holmes.ponderosa.data.sql.model.Event;
 import com.holmes.ponderosa.ui.action.ActionPresenter;
 import com.squareup.picasso.Picasso;
 import com.squareup.sqlbrite.BriteDatabase;
+import hu.akarnokd.rxjava.interop.RxJavaInterop;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 import static java.util.stream.Collectors.toList;
 
@@ -42,8 +43,9 @@ import static java.util.stream.Collectors.toList;
     this.homeSeerService = homeSeerService;
     this.eventAdapter = new EventAdapter(this.picasso, this);
 
-    events = db.createQuery(EventModel.TABLE_NAME, EventModel.SELECT_ALL) //
-        .mapToList(Event.SELECT_ALL_MAPPER::map) //
+    events = RxJavaInterop.toV2Observable( //
+        db.createQuery(EventModel.TABLE_NAME, EventModel.SELECT_ALL) //
+            .mapToList(Event.SELECT_ALL_MAPPER::map)) //
         .subscribeOn(Schedulers.io()) //
         .observeOn(AndroidSchedulers.mainThread());
 
@@ -57,8 +59,8 @@ import static java.util.stream.Collectors.toList;
         });
   }
 
-  @Override public Subscription loadData(Observable<String> selectedFilter, Action1<Integer> countAction) {
-    Subscription adapterSubscription = Observable.combineLatest(events, selectedFilter, //
+  @Override public Disposable loadData(Observable<String> selectedFilter, Consumer<Integer> countAction) {
+    Disposable adapterSubscription = Observable.combineLatest(events, selectedFilter, //
         (devices1, groupName) -> devices1.stream() //
             .filter(event -> { //
               String allTitle = resources.getString(R.string.events_filter_all); //
@@ -67,7 +69,7 @@ import static java.util.stream.Collectors.toList;
             .collect(Collectors.toList())) //
         .subscribe(eventAdapter::updateEvents);
 
-    CompositeSubscription subscriptions = new CompositeSubscription();
+    CompositeDisposable subscriptions = new CompositeDisposable();
     subscriptions.add(adapterSubscription);
     subscriptions.add(events.map(List::size).subscribe(countAction));
 

@@ -2,7 +2,7 @@ package com.holmes.ponderosa.data;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import com.f2prateek.rx.preferences.RxSharedPreferences;
+import com.f2prateek.rx.preferences2.RxSharedPreferences;
 import com.holmes.ponderosa.data.api.ApiModule;
 import com.holmes.ponderosa.data.api.auth.AuthInterceptor;
 import com.jakewharton.picasso.OkHttp3Downloader;

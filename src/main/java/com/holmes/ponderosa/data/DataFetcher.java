@@ -12,11 +12,11 @@ import com.holmes.ponderosa.data.sql.model.DeviceControl;
 import com.holmes.ponderosa.data.sql.model.DeviceControl.Type;
 import com.holmes.ponderosa.data.sql.model.DeviceControl.Use;
 import com.squareup.sqlbrite.BriteDatabase;
+import io.reactivex.Observable;
+import io.reactivex.observables.ConnectableObservable;
+import io.reactivex.schedulers.Schedulers;
 import java.util.List;
 import java.util.stream.Collectors;
-import rx.Observable;
-import rx.observables.ConnectableObservable;
-import rx.schedulers.Schedulers;
 
 public class DataFetcher {
   private final BriteDatabase db;

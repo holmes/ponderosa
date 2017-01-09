@@ -11,14 +11,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.ui.misc.BindableAdapter;
+import io.reactivex.functions.Consumer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import rx.functions.Action1;
 
 import static com.holmes.ponderosa.data.LumberYard.Entry;
 
-final class LogAdapter extends BindableAdapter<Entry> implements Action1<Entry> {
+final class LogAdapter extends BindableAdapter<Entry> implements Consumer<Entry> {
   private List<Entry> logs;
 
   public LogAdapter(Context context) {
@@ -28,11 +28,6 @@ final class LogAdapter extends BindableAdapter<Entry> implements Action1<Entry> 
 
   public void setLogs(List<Entry> logs) {
     this.logs = new ArrayList<>(logs);
-  }
-
-  @Override public void call(Entry entry) {
-    logs.add(entry);
-    notifyDataSetChanged();
   }
 
   @Override public int getCount() {
@@ -57,6 +52,11 @@ final class LogAdapter extends BindableAdapter<Entry> implements Action1<Entry> 
   @Override public void bindView(Entry item, int position, View view) {
     LogItemViewHolder viewHolder = (LogItemViewHolder) view.getTag();
     viewHolder.setEntry(item);
+  }
+
+  @Override public void accept(Entry entry) throws Exception {
+    logs.add(entry);
+    notifyDataSetChanged();
   }
 
   static final class LogItemViewHolder {

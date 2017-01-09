@@ -1,6 +1,6 @@
 package com.holmes.ponderosa.data.api;
 
-import com.f2prateek.rx.preferences.Preference;
+import com.f2prateek.rx.preferences2.Preference;
 import com.holmes.ponderosa.data.NetworkDelay;
 import com.holmes.ponderosa.data.NetworkFailurePercent;
 import com.holmes.ponderosa.data.NetworkVariancePercent;

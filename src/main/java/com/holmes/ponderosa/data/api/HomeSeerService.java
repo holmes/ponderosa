@@ -3,11 +3,11 @@ package com.holmes.ponderosa.data.api;
 import com.holmes.ponderosa.data.api.model.HSDeviceControlResponse;
 import com.holmes.ponderosa.data.api.model.HSDevicesResponse;
 import com.holmes.ponderosa.data.api.model.HSEventsResponse;
+import com.jakewharton.retrofit2.adapter.rxjava2.Result;
+import io.reactivex.Observable;
 import java.util.List;
-import retrofit2.adapter.rxjava.Result;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import rx.Observable;
 
 public interface HomeSeerService {
   @GET("JSON?request=getstatus") //
