@@ -29,7 +29,7 @@ public final class DataModule {
   static final int DISK_CACHE_SIZE = (int) MEGABYTES.toBytes(50);
 
   @Provides @Singleton SharedPreferences provideSharedPreferences(Application app) {
-    return app.getSharedPreferences("u2020", MODE_PRIVATE);
+    return app.getSharedPreferences("ponderosa", MODE_PRIVATE);
   }
 
   @Provides @Singleton RxSharedPreferences provideRxSharedPreferences(SharedPreferences prefs) {

@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
   <group android:checkableBehavior="single">
     <item
-        android:id="@+id/nav_trending"
+        android:id="@+id/nav_devices"
         android:title="@string/nav_drawer_device"
         android:icon="@drawable/nav_trending"
         android:checked="true"
         />
     <item
-        android:id="@+id/nav_search"
+        android:id="@+id/nav_events"
         android:title="@string/nav_drawer_event"
         android:icon="@drawable/nav_search"
         />

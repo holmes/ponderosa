@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import timber.log.Timber;
 
 import static java.util.stream.Collectors.toList;
 
@@ -69,6 +70,8 @@ import static java.util.stream.Collectors.toList;
   }
 
   @Override public Disposable loadData(Observable<String> selectedFilter, Consumer<Integer> countAction) {
+    devices.subscribe(devices1 -> Timber.d("Found %d devices", devices1.size()));
+
     Disposable adapterSubscription = Observable.combineLatest(devices, selectedFilter, //
         (devices1, location) -> devices1.stream() //
             .filter(device -> { //

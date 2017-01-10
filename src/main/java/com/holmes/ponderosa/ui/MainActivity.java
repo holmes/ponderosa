@@ -17,6 +17,8 @@ import android.widget.TextView;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.f2prateek.rx.preferences2.Preference;
+import com.f2prateek.rx.preferences2.RxSharedPreferences;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.Injector;
 import com.holmes.ponderosa.data.api.auth.CredentialManager;
@@ -28,6 +30,8 @@ import static com.holmes.ponderosa.ui.action.ActionsView.PresenterType.DEVICES;
 import static com.holmes.ponderosa.ui.action.ActionsView.PresenterType.EVENTS;
 
 public final class MainActivity extends Activity {
+  private static final String ACTION_VIEW_LAST_TYPE = "action-view-last-type-index";
+
   @BindView(R.id.main_drawer_layout) DrawerLayout drawerLayout;
   @BindView(R.id.main_navigation) NavigationView drawer;
   @BindView(R.id.main_content) ViewGroup content;
@@ -35,8 +39,10 @@ public final class MainActivity extends Activity {
 
   @Inject CredentialManager credentialManager;
   @Inject ViewContainer viewContainer;
+  @Inject RxSharedPreferences preferences;
 
   private ObjectGraph activityGraph;
+  private Preference<Integer> lastActionView;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -55,6 +61,7 @@ public final class MainActivity extends Activity {
     ViewGroup container = viewContainer.forActivity(this);
 
     inflater.inflate(R.layout.main_activity, container);
+    lastActionView = preferences.getInteger(ACTION_VIEW_LAST_TYPE, DEVICES.ordinal());
     ButterKnife.bind(this, container);
 
     ViewGroup view = (ViewGroup) inflater.inflate(R.layout.actions_view, content);
@@ -62,13 +69,15 @@ public final class MainActivity extends Activity {
 
     drawerLayout.setStatusBarBackgroundColor(statusBarColor);
     drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+
+    // Waiting on RxBinding for RxJava2 to do something useful with this.
     drawer.setNavigationItemSelectedListener(item -> {
       switch (item.getItemId()) {
-        case R.id.nav_search:
-          actionsView.loadPresenter(EVENTS);
+        case R.id.nav_events:
+          displayActionView(actionsView, EVENTS);
           break;
-        case R.id.nav_trending:
-          actionsView.loadPresenter(DEVICES);
+        case R.id.nav_devices:
+          displayActionView(actionsView, DEVICES);
           break;
         case R.id.nav_credentials:
           signIn();
@@ -82,20 +91,28 @@ public final class MainActivity extends Activity {
 
       return true;
     });
+
+    // Select the last used view.
+    ActionsView.PresenterType presenterType = ActionsView.PresenterType.values()[lastActionView.get()];
+    drawer.setCheckedItem(presenterType == DEVICES ? R.id.nav_devices : R.id.nav_events);
+    displayActionView(actionsView, presenterType);
+  }
+
+  private void displayActionView(ActionsView view, ActionsView.PresenterType type) {
+    view.loadPresenter(type);
+    lastActionView.set(type.ordinal());
   }
 
   private void signIn() {
     ViewGroup dialogView = (ViewGroup) LayoutInflater.from(this).inflate(R.layout.dialog_sign_in, null);
 
-    new AlertDialog.Builder(this)
-        .setView(dialogView) //
-        .setTitle(R.string.sign_in_title)
-        .setPositiveButton(R.string.save, (dialog, which) -> {
-          String username = ((TextView) dialogView.findViewById(R.id.sign_in_username)).getText().toString();
-          String password = ((TextView) dialogView.findViewById(R.id.sign_in_password)).getText().toString();
-          credentialManager.save(username, password);
-          drawerLayout.closeDrawers();
-        }).setNegativeButton(R.string.cancel, (dialog, which) -> drawerLayout.closeDrawers()) //
+    new AlertDialog.Builder(this).setView(dialogView) //
+        .setTitle(R.string.sign_in_title).setPositiveButton(R.string.save, (dialog, which) -> {
+      String username = ((TextView) dialogView.findViewById(R.id.sign_in_username)).getText().toString();
+      String password = ((TextView) dialogView.findViewById(R.id.sign_in_password)).getText().toString();
+      credentialManager.save(username, password);
+      drawerLayout.closeDrawers();
+    }).setNegativeButton(R.string.cancel, (dialog, which) -> drawerLayout.closeDrawers()) //
         .show();
   }
 

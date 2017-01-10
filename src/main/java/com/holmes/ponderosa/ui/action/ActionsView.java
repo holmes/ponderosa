@@ -109,9 +109,6 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
     itemsView.setLayoutManager(new LinearLayoutManager(getContext()));
     itemsView.addItemDecoration(
         new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, dividerPaddingStart, safeIsRtl()));
-
-    // TODO load last one seen?
-    loadPresenter(PresenterType.DEVICES);
   }
 
   public void loadPresenter(PresenterType type) {
@@ -130,13 +127,8 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
     actionTitle.setText(currentPresenter.getActionTitle());
     itemsView.setAdapter(currentPresenter.getAdapter());
 
-    subscriptions.add(currentPresenter.loadData(filterSubject, updateViewAction));
+    subscriptions.add(currentPresenter.loadData(filterSubject.startWith("All"), updateViewAction));
     subscriptions.add(currentPresenter.getFilterOptions().subscribe(filterAdapter::update));
-  }
-
-  @Override protected void onAttachedToWindow() {
-    super.onAttachedToWindow();
-    subscriptions.add(currentPresenter.loadData(filterSubject, updateViewAction));
   }
 
   //private final Action1<Result<HSDevicesResponse>> trendingError = new Action1<Result<HSDevicesResponse>>() {
@@ -158,7 +150,7 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
   }
 
   @OnItemSelected(R.id.action_filter)
-  void timespanSelected(final int position) {
+  void onFilterSelected(final int position) {
     if (animatorView.getDisplayedChildId() != R.id.trending_swipe_refresh) {
       animatorView.setDisplayedChildId(R.id.trending_loading);
     }
@@ -173,7 +165,7 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
   }
 
   @Override public void onRefresh() {
-    timespanSelected(filterView.getSelectedItemPosition());
+    onFilterSelected(filterView.getSelectedItemPosition());
   }
 
   private boolean safeIsRtl() {

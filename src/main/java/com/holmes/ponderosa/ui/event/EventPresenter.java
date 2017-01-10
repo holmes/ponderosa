@@ -66,6 +66,12 @@ import static java.util.stream.Collectors.toList;
               String allTitle = resources.getString(R.string.events_filter_all); //
               return Objects.equals(groupName, allTitle) || event.group_name().equals(groupName);
             }) //
+            .sorted((o1, o2) -> {
+              if (o1.group_name().equals(o2.group_name())) {
+                return o1.name().compareTo(o2.name());
+              }
+              return o1.group_name().compareTo(o2.group_name());
+            })
             .collect(Collectors.toList())) //
         .subscribe(eventAdapter::updateEvents);
 
