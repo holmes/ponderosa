@@ -5,6 +5,8 @@ import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,12 +16,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.ContextThemeWrapper;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.OnItemSelected;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.DataFetcher;
@@ -37,16 +39,19 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.PublishSubject;
 import javax.inject.Inject;
 
-public final class ActionsView extends LinearLayout implements SwipeRefreshLayout.OnRefreshListener {
+public final class ActionsView extends CoordinatorLayout implements SwipeRefreshLayout.OnRefreshListener {
   public static String TAG = "ACTIONS_VIEW_TAG";
 
-  @BindView(R.id.trending_toolbar) Toolbar toolbarView;
+  @BindView(R.id.actions_toolbar) Toolbar toolbarView;
   @BindView(R.id.action_title) TextView actionTitle;
   @BindView(R.id.action_filter) Spinner filterView;
-  @BindView(R.id.trending_animator) BetterViewAnimator animatorView;
-  @BindView(R.id.trending_swipe_refresh) SwipeRefreshLayout swipeRefreshView;
-  @BindView(R.id.trending_list) public RecyclerView itemsView;
-  @BindView(R.id.trending_loading_message) TextView loadingMessageView;
+  @BindView(R.id.actions_animator) BetterViewAnimator animatorView;
+  @BindView(R.id.actions_swipe_refresh) SwipeRefreshLayout swipeRefreshView;
+  @BindView(R.id.actions_list) public RecyclerView itemsView;
+  @BindView(R.id.actions_loading_message) TextView loadingMessageView;
+
+  @BindView(R.id.actions_fab) FloatingActionButton floatingActionButton;
+  //@BindView(R.id.fab_actions_menu) LinearLayout floatingActionMenu;
 
   @BindDimen(R.dimen.trending_divider_padding_start) float dividerPaddingStart;
 
@@ -67,8 +72,8 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
 
   private Consumer<Integer> updateViewAction = count -> {
     animatorView.setDisplayedChildId(count == 0 //
-        ? R.id.trending_empty //
-        : R.id.trending_swipe_refresh);
+        ? R.id.actions_empty //
+        : R.id.actions_swipe_refresh);
     swipeRefreshView.setRefreshing(false);
   };
 
@@ -144,15 +149,20 @@ public final class ActionsView extends LinearLayout implements SwipeRefreshLayou
   //  }
   //};
 
-  @Override protected void onDetachedFromWindow() {
+  @Override public void onDetachedFromWindow() {
     super.onDetachedFromWindow();
     subscriptions.dispose();
   }
 
+  @OnClick(R.id.actions_fab)
+  void onFABTapped() {
+    //floatingActionMenu.setVisibility(VISIBLE);
+  }
+
   @OnItemSelected(R.id.action_filter)
   void onFilterSelected(final int position) {
-    if (animatorView.getDisplayedChildId() != R.id.trending_swipe_refresh) {
-      animatorView.setDisplayedChildId(R.id.trending_loading);
+    if (animatorView.getDisplayedChildId() != R.id.actions_swipe_refresh) {
+      animatorView.setDisplayedChildId(R.id.actions_loading);
     }
 
     // For whatever reason, the SRL's spinner does not draw itself when we call setRefreshing(true)

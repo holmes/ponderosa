@@ -1,157 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.holmes.ponderosa.ui.action.ActionsView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     >
-  <android.support.v7.widget.Toolbar
-      android:id="@+id/trending_toolbar"
+
+  <android.support.design.widget.AppBarLayout
+      android:id="@+id/app_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:background="?attr/colorPrimary"
-      android:elevation="4dp"
-      android:minHeight="?attr/actionBarSize"
-      android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-      tools:ignore="UnusedAttribute"
       >
-    <LinearLayout
-        android:id="@+id/trending_toolbar_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
-        android:orientation="horizontal"
-        >
-      <TextView
-          android:id="@+id/action_title"
-          android:layout_width="wrap_content"
+      <android.support.v7.widget.Toolbar
+          android:id="@+id/actions_toolbar"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:paddingEnd="6dp"
-          android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
-          />
-      <Spinner
-          android:id="@+id/action_filter"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:popupBackground="@drawable/popup_background"
-          />
-    </LinearLayout>
-  </android.support.v7.widget.Toolbar>
+          android:background="?attr/colorPrimary"
+          android:elevation="4dp"
+          android:minHeight="?attr/actionBarSize"
+          android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+          app:layout_collapseMode="pin"
+          app:layout_scrollFlags="scroll|enterAlways"
+          tools:ignore="UnusedAttribute"
+          >
+        <LinearLayout
+            android:id="@+id/actions_toolbar_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:orientation="horizontal"
+            >
+          <TextView
+              android:id="@+id/action_title"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:paddingEnd="6dp"
+              android:paddingStart="6dp"
+              android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+              />
+          <Spinner
+              android:id="@+id/action_filter"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:popupBackground="@drawable/popup_background"
+              />
+        </LinearLayout>
+      </android.support.v7.widget.Toolbar>
+  </android.support.design.widget.AppBarLayout>
+
   <com.holmes.ponderosa.ui.misc.BetterViewAnimator
-      android:id="@+id/trending_animator"
+      android:id="@+id/actions_animator"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:inAnimation="@android:anim/fade_in"
       android:outAnimation="@android:anim/fade_out"
+      app:layout_behavior="@string/appbar_scrolling_view_behavior"
       >
     <RelativeLayout
-        android:id="@+id/trending_loading"
+        android:id="@+id/actions_loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="48dp"
         >
       <ImageView
-          android:id="@+id/trending_loading_image"
+          android:id="@+id/actions_loading_image"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_centerInParent="true"
-          android:layout_marginTop="32dp"
           android:layout_marginBottom="32dp"
-          android:src="@drawable/loading"
-          android:scaleType="center"
+          android:layout_marginTop="32dp"
           android:clickable="true"
           android:importantForAccessibility="no"
+          android:scaleType="center"
+          android:src="@drawable/loading"
           />
       <TextView
-          android:id="@+id/trending_loading_message"
+          android:id="@+id/actions_loading_message"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_below="@id/trending_loading_image"
+          android:layout_below="@id/actions_loading_image"
           android:layout_centerHorizontal="true"
           android:gravity="center_horizontal"
           android:text="@string/loading_message"
           />
     </RelativeLayout>
     <RelativeLayout
-        android:id="@+id/trending_error"
+        android:id="@+id/actions_error"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="48dp"
         >
       <ImageView
-          android:id="@+id/trending_error_image"
+          android:id="@+id/actions_error_image"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_centerInParent="true"
-          android:layout_marginTop="32dp"
           android:layout_marginBottom="32dp"
-          android:src="@drawable/error"
+          android:layout_marginTop="32dp"
           android:importantForAccessibility="no"
+          android:src="@drawable/error"
           />
       <TextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_above="@id/trending_error_image"
+          android:layout_above="@id/actions_error_image"
           android:gravity="center_horizontal"
           android:text="@string/error_title"
-          android:textSize="34sp"
           android:textColor="?android:attr/textColorPrimary"
+          android:textSize="34sp"
           />
       <TextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_below="@id/trending_error_image"
+          android:layout_below="@id/actions_error_image"
           android:gravity="center_horizontal"
           android:text="@string/error_message"
           />
     </RelativeLayout>
     <RelativeLayout
-        android:id="@+id/trending_empty"
+        android:id="@+id/actions_empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="48dp"
         >
       <ImageView
-          android:id="@+id/trending_empty_image"
+          android:id="@+id/actions_empty_image"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_centerInParent="true"
-          android:layout_marginTop="32dp"
           android:layout_marginBottom="32dp"
-          android:src="@drawable/empty"
+          android:layout_marginTop="32dp"
           android:importantForAccessibility="no"
+          android:src="@drawable/empty"
           />
       <TextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_above="@id/trending_empty_image"
+          android:layout_above="@id/actions_empty_image"
           android:gravity="center_horizontal"
           android:text="@string/empty_title"
-          android:textSize="34sp"
           android:textColor="?android:attr/textColorPrimary"
+          android:textSize="34sp"
           />
       <TextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_below="@id/trending_empty_image"
+          android:layout_below="@id/actions_empty_image"
           android:gravity="center_horizontal"
           android:text="@string/empty_message"
           />
     </RelativeLayout>
     <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/trending_swipe_refresh"
+        android:id="@+id/actions_swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
       <android.support.v7.widget.RecyclerView
-          android:id="@+id/trending_list"
+          android:id="@+id/actions_list"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           />
     </android.support.v4.widget.SwipeRefreshLayout>
   </com.holmes.ponderosa.ui.misc.BetterViewAnimator>
+
+  <android.support.design.widget.FloatingActionButton
+      android:id="@+id/actions_fab"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="bottom|end"
+      android:layout_margin="@dimen/fab_margin"
+      android:src="@drawable/dev_app_icon"
+      />
+  <!--<LinearLayout-->
+  <!--android:id="@+id/fab_actions_menu"-->
+  <!--android:layout_width="wrap_content"-->
+  <!--android:layout_height="wrap_content"-->
+  <!--android:layout_marginBottom="12dp"-->
+  <!--android:layout_marginEnd="24dp"-->
+  <!--android:gravity="center_vertical"-->
+  <!--android:orientation="horizontal"-->
+  <!--android:visibility="invisible"-->
+  <!--app:layout_constraintBottom_toTopOf="@id/actions_fab"-->
+  <!--app:layout_constraintRight_toRightOf="@id/actions_swipe_refresh"-->
+  <!--&gt;-->
+  <!--<TextView-->
+  <!--android:id="@+id/shareLabelTextView"-->
+  <!--android:layout_width="wrap_content"-->
+  <!--android:layout_height="wrap_content"-->
+  <!--android:layout_marginEnd="8dp"-->
+  <!--android:elevation="2dp"-->
+  <!--android:fontFamily="sans-serif"-->
+  <!--android:padding="5dip"-->
+  <!--android:text="Things"-->
+  <!--android:textColor="@android:color/white"-->
+  <!--android:typeface="normal"-->
+  <!--/>-->
+  <!--<android.support.design.widget.FloatingActionButton-->
+  <!--android:id="@+id/childFab"-->
+  <!--android:layout_width="wrap_content"-->
+  <!--android:layout_height="wrap_content"-->
+  <!--android:src="@drawable/dev_app_icon"-->
+  <!--app:fabSize="mini"-->
+  <!--/>-->
+  <!--</LinearLayout>-->
 </com.holmes.ponderosa.ui.action.ActionsView>

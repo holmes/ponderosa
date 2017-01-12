@@ -27,4 +27,6 @@
   <string name="sign_in_title">Enter your HomeSeer Login</string>
   <string name="devices_filter_all">All</string>
   <string name="events_filter_all">All</string>
+  <string name="title_activity_scrolling">ScrollingActivity</string>
+  <string name="action_settings">Settings</string>
 </resources>

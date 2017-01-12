@@ -2,4 +2,5 @@
 <resources>
   <!-- Item start padding (16) + avatar width (40) + avatar margin (16). -->
   <dimen name="trending_divider_padding_start">72dp</dimen>
+  <dimen name="fab_margin">16dp</dimen>
 </resources>
