@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/fab_mini_margin"
+    android:layout_marginBottom="@dimen/fab_mini_margin"
+    android:gravity="center_vertical"
+    app:layout_constraintBottom_toTopOf="@id/actions_fab"
+    app:layout_constraintRight_toRightOf="@id/activity_main"
+    >
+  <TextView
+      android:id="@+id/createLabelTextView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:clickable="true"
+      android:paddingStart="@dimen/fab_label_padding"
+      android:paddingEnd="@dimen/fab_label_padding"
+      />
+  <android.support.design.widget.FloatingActionButton
+      android:id="@+id/first_event"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:clickable="true"
+      android:src="@drawable/dev_app_icon"
+      app:fabSize="mini"
+      />
+</LinearLayout>

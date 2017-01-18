@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.ContextThemeWrapper;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import butterknife.BindDimen;
@@ -45,13 +46,14 @@ public final class ActionsView extends CoordinatorLayout implements SwipeRefresh
   @BindView(R.id.actions_toolbar) Toolbar toolbarView;
   @BindView(R.id.action_title) TextView actionTitle;
   @BindView(R.id.action_filter) Spinner filterView;
+
   @BindView(R.id.actions_animator) BetterViewAnimator animatorView;
   @BindView(R.id.actions_swipe_refresh) SwipeRefreshLayout swipeRefreshView;
   @BindView(R.id.actions_list) public RecyclerView itemsView;
   @BindView(R.id.actions_loading_message) TextView loadingMessageView;
 
   @BindView(R.id.actions_fab) FloatingActionButton floatingActionButton;
-  //@BindView(R.id.fab_actions_menu) LinearLayout floatingActionMenu;
+  @BindView(R.id.actions_fab_menu) LinearLayout floatingActionMenu;
 
   @BindDimen(R.dimen.trending_divider_padding_start) float dividerPaddingStart;
 
@@ -156,7 +158,8 @@ public final class ActionsView extends CoordinatorLayout implements SwipeRefresh
 
   @OnClick(R.id.actions_fab)
   void onFABTapped() {
-    //floatingActionMenu.setVisibility(VISIBLE);
+    
+    floatingActionMenu.setVisibility(VISIBLE);
   }
 
   @OnItemSelected(R.id.action_filter)
