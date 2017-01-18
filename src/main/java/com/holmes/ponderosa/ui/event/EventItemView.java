@@ -11,8 +11,9 @@ import butterknife.ButterKnife;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.ui.transform.CircleStrokeTransformation;
 import com.squareup.picasso.Picasso;
+import io.reactivex.functions.Consumer;
 
-public final class EventItemView extends RelativeLayout {
+public final class EventItemView extends RelativeLayout implements Consumer<EventItemView.EventItemViewModel> {
   @BindView(R.id.device_item_status_image) ImageView avatarView;
   @BindView(R.id.device_item_name) TextView nameView;
 
@@ -22,7 +23,7 @@ public final class EventItemView extends RelativeLayout {
     super(context, attrs);
 
     // TODO: Make this a singleton.
-    avatarTransformation =
+    this.avatarTransformation =
         new CircleStrokeTransformation(context, ContextCompat.getColor(context, R.color.avatar_stroke), 1);
   }
 
@@ -31,14 +32,14 @@ public final class EventItemView extends RelativeLayout {
     ButterKnife.bind(this);
   }
 
-  public void bindTo(EventItemViewModel model) {
+  @Override public void accept(EventItemViewModel eventItemViewModel) throws Exception {
+    this.nameView.setText(eventItemViewModel.title);
+
     //model.picasso.load(model.statusImage)
     //    .placeholder(R.drawable.avatar)
     //    .fit()
     //    .transform(avatarTransformation)
     //    .into(avatarView);
-
-    nameView.setText(model.title);
   }
 
   static class EventItemViewModel {
