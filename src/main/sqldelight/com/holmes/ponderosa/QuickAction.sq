@@ -1,0 +1,31 @@
+CREATE TABLE quick_action (
+  _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  last_ran INTEGER NOT NULL,
+  action_key TEXT NOT NULL,
+  action_blob TEXT NOT NULL
+);
+
+action_key_index:
+CREATE UNIQUE INDEX quick_action_key ON quick_action(action_key);
+
+last_ran_index:
+CREATE UNIQUE INDEX quick_action_last_ran ON quick_action(last_ran);
+
+select_all:
+SELECT *
+FROM quick_action;
+
+most_recent:
+SELECT *
+FROM quick_action
+ORDER BY last_ran DESC
+LIMIT 5;
+
+insert_row:
+INSERT OR REPLACE INTO quick_action(last_ran, action_key, action_blob)
+VALUES (?, ?, ?);
+
+update_value:
+UPDATE quick_action
+SET last_ran = ?
+WHERE action_key = ?;

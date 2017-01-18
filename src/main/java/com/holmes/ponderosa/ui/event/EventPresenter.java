@@ -4,9 +4,8 @@ import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import com.holmes.ponderosa.EventModel;
 import com.holmes.ponderosa.R;
-import com.holmes.ponderosa.data.DataFetcher;
-import com.holmes.ponderosa.data.api.HomeSeerService;
 import com.holmes.ponderosa.data.sql.model.Event;
+import com.holmes.ponderosa.ui.action.ActionPerformer;
 import com.holmes.ponderosa.ui.action.ActionPresenter;
 import com.squareup.picasso.Picasso;
 import com.squareup.sqlbrite.BriteDatabase;
@@ -26,21 +25,19 @@ import javax.inject.Singleton;
 import static java.util.stream.Collectors.toList;
 
 @Singleton public final class EventPresenter implements ActionPresenter, EventAdapter.EventClickListener {
-  private final DataFetcher dataFetcher;
+  private final ActionPerformer actionPerformer;
   private final Picasso picasso;
   private final Resources resources;
-  private final HomeSeerService homeSeerService;
   private final EventAdapter eventAdapter;
 
   private Observable<List<Event>> events;
   private Observable<List<String>> filters;
 
-  @Inject public EventPresenter(BriteDatabase db, DataFetcher dataFetcher, Picasso picasso, Resources resources,
-      HomeSeerService homeSeerService) {
-    this.dataFetcher = dataFetcher;
+  @Inject
+  public EventPresenter(ActionPerformer actionPerformer, BriteDatabase db, Picasso picasso, Resources resources) {
+    this.actionPerformer = actionPerformer;
     this.picasso = picasso;
     this.resources = resources;
-    this.homeSeerService = homeSeerService;
     this.eventAdapter = new EventAdapter(this.picasso, this);
 
     events = RxJavaInterop.toV2Observable( //
@@ -71,8 +68,7 @@ import static java.util.stream.Collectors.toList;
                 return o1.name().compareTo(o2.name());
               }
               return o1.group_name().compareTo(o2.group_name());
-            })
-            .collect(Collectors.toList())) //
+            }).collect(Collectors.toList())) //
         .subscribe(eventAdapter::updateEvents);
 
     CompositeDisposable subscriptions = new CompositeDisposable();
@@ -94,10 +90,7 @@ import static java.util.stream.Collectors.toList;
     return filters;
   }
 
-  @Override public void onEventTapped(Event event) {
-    homeSeerService.runEvent(event.id())
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(hsDevicesResponseResult -> dataFetcher.refresh());
+  @Override public void accept(Event event) {
+    actionPerformer.runEvent(event);
   }
 }

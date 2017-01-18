@@ -6,12 +6,12 @@ public class HSDevice {
   @NonNull public final String ref;
   @NonNull public final String name;
   @NonNull public final String location;
-  @NonNull public final Integer value;
+  @NonNull public final Double value;
   @NonNull public final HSDeviceInfo device_type;
   @NonNull public final String status;
   @NonNull public final String status_image;
 
-  public HSDevice(@NonNull String name, @NonNull String ref, @NonNull String location, @NonNull Integer value,
+  public HSDevice(@NonNull String name, @NonNull String ref, @NonNull String location, @NonNull Double value,
       @NonNull HSDeviceInfo device_type, @NonNull String status, @NonNull  String status_image) {
     this.name = name;
     this.ref = ref;

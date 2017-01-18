@@ -158,7 +158,7 @@ public final class ActionsView extends CoordinatorLayout implements SwipeRefresh
 
   @OnClick(R.id.actions_fab)
   void onFABTapped() {
-    
+
     floatingActionMenu.setVisibility(VISIBLE);
   }
 

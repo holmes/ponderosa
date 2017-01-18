@@ -4,7 +4,7 @@ CREATE TABLE devices (
   ref TEXT NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   location TEXT NOT NULL,
-  value INTEGER NOT NULL,
+  value REAL NOT NULL,
   device_type INTEGER AS Device.Type NOT NULL,
   device_subtype INTEGER NOT NULL,
   status TEXT NOT NULL,

@@ -5,10 +5,9 @@ import android.support.v7.widget.RecyclerView;
 import com.holmes.ponderosa.DeviceControlModel;
 import com.holmes.ponderosa.DeviceModel;
 import com.holmes.ponderosa.R;
-import com.holmes.ponderosa.data.DataFetcher;
-import com.holmes.ponderosa.data.api.HomeSeerService;
 import com.holmes.ponderosa.data.sql.model.Device;
 import com.holmes.ponderosa.data.sql.model.DeviceControl;
+import com.holmes.ponderosa.ui.action.ActionPerformer;
 import com.holmes.ponderosa.ui.action.ActionPresenter;
 import com.squareup.picasso.Picasso;
 import com.squareup.sqlbrite.BriteDatabase;
@@ -29,35 +28,32 @@ import timber.log.Timber;
 import static java.util.stream.Collectors.toList;
 
 @Singleton public final class DevicePresenter implements ActionPresenter, DeviceAdapter.DeviceClickListener {
-  private final DataFetcher dataFetcher;
+  private final ActionPerformer actionPerformer;
   private final Picasso picasso;
   private final Resources resources;
-  private final HomeSeerService homeSeerService;
   private final DeviceAdapter deviceAdapter;
 
   private final Observable<List<Device>> devices;
   private final Observable<List<DeviceControl>> controls;
   private final Observable<List<String>> filters;
 
-  @Inject public DevicePresenter(BriteDatabase db, DataFetcher dataFetcher, Picasso picasso, Resources resources,
-      HomeSeerService homeSeerService) {
-    this.dataFetcher = dataFetcher;
+  @Inject
+  public DevicePresenter(ActionPerformer actionPerformer, BriteDatabase db, Picasso picasso, Resources resources) {
+    this.actionPerformer = actionPerformer;
     this.picasso = picasso;
     this.resources = resources;
-    this.homeSeerService = homeSeerService;
     this.deviceAdapter = new DeviceAdapter(this.picasso, this);
 
     devices = RxJavaInterop.toV2Observable( //
         db.createQuery(DeviceModel.TABLE_NAME, DeviceModel.SELECT_ALL) //
-        .mapToList(Device.SELECT_ALL_MAPPER::map)) //
+            .mapToList(Device.SELECT_ALL_MAPPER::map)) //
         .subscribeOn(Schedulers.io()) //
         .observeOn(AndroidSchedulers.mainThread());
 
     controls = RxJavaInterop.toV2Observable( //
         db.createQuery(DeviceControlModel.TABLE_NAME, DeviceControlModel.SELECT_ALL) //
-        .mapToList(DeviceControl.SELECT_ALL_MAPPER::map)) //
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread());
+            .mapToList(DeviceControl.SELECT_ALL_MAPPER::map)) //
+        .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     filters = devices.map((foundDevices) -> foundDevices.stream() //
         .filter(DeviceFilters.allowableDevices()).map(Device::location) //
@@ -101,12 +97,7 @@ import static java.util.stream.Collectors.toList;
     return deviceAdapter;
   }
 
-  @Override public void onDeviceTapped(Device device) {
-    // TODO move this somewhere else and look at the actual controls for values.
-    int newValue = device.value() > 0 ? 0 : 255;
-    homeSeerService.controlDevice(device.ref(), newValue)
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(hsDevicesResponseResult -> dataFetcher.refresh());
+  @Override public void accept(Device device) {
+    actionPerformer.runDeviceControl(device, null);
   }
 }
