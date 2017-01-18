@@ -11,8 +11,9 @@ import butterknife.ButterKnife;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.ui.transform.CircleStrokeTransformation;
 import com.squareup.picasso.Picasso;
+import io.reactivex.functions.Consumer;
 
-public final class DeviceItemView extends RelativeLayout {
+public final class DeviceItemView extends RelativeLayout implements Consumer<DeviceItemView.DeviceItemViewModel> {
   @BindView(R.id.device_item_status_image) ImageView avatarView;
   @BindView(R.id.device_item_status) TextView statusView;
   @BindView(R.id.device_item_name) TextView nameView;
@@ -32,7 +33,7 @@ public final class DeviceItemView extends RelativeLayout {
     ButterKnife.bind(this);
   }
 
-  public void bindTo(DeviceItemViewModel model) {
+  @Override public void accept(DeviceItemViewModel model) {
     model.picasso.load(model.statusImage)
         .placeholder(R.drawable.avatar)
         .fit()

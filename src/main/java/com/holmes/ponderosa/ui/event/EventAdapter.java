@@ -9,13 +9,13 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.squareup.picasso.Picasso;
 import hu.akarnokd.rxjava.interop.RxJavaInterop;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.PublishSubject;
 import java.util.Collections;
 import java.util.List;
 
 final class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
-  public interface EventClickListener {
-    void onEventTapped(Event event);
+  public interface EventClickListener extends Consumer<Event> {
   }
 
   private final Picasso picasso;
@@ -45,7 +45,7 @@ final class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
   }
 
   @Override public void onViewRecycled(ViewHolder holder) {
-    holder.dispose();
+    holder.disposable.dispose();
   }
 
   @Override public long getItemId(int position) {
@@ -73,18 +73,14 @@ final class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
           }).subscribe(itemView));
 
       this.disposable.add(RxJavaInterop.toV2Observable( //
-          RxView.clicks(itemView)
+          RxView.clicks(itemView) //
               .map(aVoid -> "")) // Hack for RxJava2.
-          .map(aVoid -> events.get(getAdapterPosition()))
-          .subscribe(eventClickListener::onEventTapped));
+          .map(aVoid -> events.get(getAdapterPosition())) //
+          .subscribe(eventClickListener));
     }
 
     void bindTo(Event event) {
       this.event.onNext(event);
-    }
-
-    void dispose() {
-      disposable.dispose();
     }
   }
 }
