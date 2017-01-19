@@ -187,8 +187,34 @@
         android:id="@+id/actions_fab_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:orientation="vertical"
-        />
+        android:visibility="gone"
+        >
+      <com.holmes.ponderosa.ui.action.FabMiniRow
+          android:id="@+id/fab_mini_1"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          />
+      <com.holmes.ponderosa.ui.action.FabMiniRow
+          android:id="@+id/fab_mini_2"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          />
+      <com.holmes.ponderosa.ui.action.FabMiniRow
+          android:id="@+id/fab_mini_3"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          />
+      <com.holmes.ponderosa.ui.action.FabMiniRow
+          android:id="@+id/fab_mini_4"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          />
+      <com.holmes.ponderosa.ui.action.FabMiniRow
+          android:id="@+id/fab_mini_5"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          />
+        </LinearLayout>
   </android.support.constraint.ConstraintLayout>
 </com.holmes.ponderosa.ui.action.ActionsView>

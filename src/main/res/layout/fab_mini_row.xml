@@ -12,7 +12,7 @@
     app:layout_constraintRight_toRightOf="@id/activity_main"
     >
   <TextView
-      android:id="@+id/createLabelTextView"
+      android:id="@+id/mini_fab_title"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:clickable="true"
@@ -20,7 +20,7 @@
       android:paddingEnd="@dimen/fab_label_padding"
       />
   <android.support.design.widget.FloatingActionButton
-      android:id="@+id/first_event"
+      android:id="@+id/min_fab_fab"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:clickable="true"

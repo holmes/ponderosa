@@ -18,7 +18,7 @@ import com.squareup.sqldelight.RowMapper;
     String key = String.format(EVENT_KEY, event.id());
     QuickActionEvent quickActionEvent = new QuickActionEvent(event.name(), event.id());
     String blob = moshi.adapter(QuickActionEvent.class).toJson(quickActionEvent);
-    return new AutoValue_QuickAction(-1, System.currentTimeMillis(), key, blob);
+    return new AutoValue_QuickAction(-1, quickActionEvent.name, System.currentTimeMillis(), key, blob);
   }
 
   @SuppressLint("DefaultLocale") //
@@ -26,7 +26,7 @@ import com.squareup.sqldelight.RowMapper;
     String key = String.format(DEVICE_KEY, device.ref(), deviceControl._id());
     QuickActionDevice quickActionDevice = new QuickActionDevice(device.name(), device.ref(), value);
     String blob = moshi.adapter(QuickActionDevice.class).toJson(quickActionDevice);
-    return new AutoValue_QuickAction(-1, System.currentTimeMillis(), key, blob);
+    return new AutoValue_QuickAction(-1, quickActionDevice.name, System.currentTimeMillis(), key, blob);
   }
 
   private static class QuickActionEvent {

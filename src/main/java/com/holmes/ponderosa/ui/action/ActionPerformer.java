@@ -49,7 +49,7 @@ import javax.inject.Singleton;
 
   private void updateQuickAction(QuickAction quickAction) {
     QuickAction.Insert_row insertRow = new QuickAction.Insert_row(db.getWritableDatabase());
-    insertRow.bind(quickAction.last_ran(), quickAction.action_key(), quickAction.action_blob());
+    insertRow.bind(quickAction.name(), quickAction.last_ran(), quickAction.action_key(), quickAction.action_blob());
     db.executeInsert(QuickAction.TABLE_NAME, insertRow.program);
   }
 }

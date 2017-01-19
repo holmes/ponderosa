@@ -30,8 +30,8 @@ import static java.util.stream.Collectors.toList;
   private final Resources resources;
   private final EventAdapter eventAdapter;
 
-  private Observable<List<Event>> events;
-  private Observable<List<String>> filters;
+  private final Observable<List<Event>> events;
+  private final Observable<List<String>> filters;
 
   @Inject
   public EventPresenter(ActionPerformer actionPerformer, BriteDatabase db, Picasso picasso, Resources resources) {

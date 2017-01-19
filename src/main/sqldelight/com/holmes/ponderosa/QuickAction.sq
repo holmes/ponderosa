@@ -1,5 +1,6 @@
 CREATE TABLE quick_action (
   _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
   last_ran INTEGER NOT NULL,
   action_key TEXT NOT NULL,
   action_blob TEXT NOT NULL
@@ -22,10 +23,5 @@ ORDER BY last_ran DESC
 LIMIT 5;
 
 insert_row:
-INSERT OR REPLACE INTO quick_action(last_ran, action_key, action_blob)
-VALUES (?, ?, ?);
-
-update_value:
-UPDATE quick_action
-SET last_ran = ?
-WHERE action_key = ?;
+INSERT OR REPLACE INTO quick_action(name, last_ran, action_key, action_blob)
+VALUES (?, ?, ?, ?);

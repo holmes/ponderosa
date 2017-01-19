@@ -6,7 +6,6 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,13 +15,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.ContextThemeWrapper;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.OnItemSelected;
 import com.holmes.ponderosa.R;
 import com.holmes.ponderosa.data.DataFetcher;
@@ -52,9 +49,6 @@ public final class ActionsView extends CoordinatorLayout implements SwipeRefresh
   @BindView(R.id.actions_list) public RecyclerView itemsView;
   @BindView(R.id.actions_loading_message) TextView loadingMessageView;
 
-  @BindView(R.id.actions_fab) FloatingActionButton floatingActionButton;
-  @BindView(R.id.actions_fab_menu) LinearLayout floatingActionMenu;
-
   @BindDimen(R.dimen.trending_divider_padding_start) float dividerPaddingStart;
 
   @Inject BriteDatabase db;
@@ -64,6 +58,7 @@ public final class ActionsView extends CoordinatorLayout implements SwipeRefresh
   @Inject IntentFactory intentFactory;
   @Inject DrawerLayout drawerLayout;
 
+  @Inject QuickActionPresenter quickActionPresenter;
   @Inject DevicePresenter devicePresenter;
   @Inject EventPresenter eventPresenter;
   private ActionPresenter currentPresenter;
@@ -97,7 +92,9 @@ public final class ActionsView extends CoordinatorLayout implements SwipeRefresh
 
   @Override protected void onFinishInflate() {
     super.onFinishInflate();
+
     ButterKnife.bind(this);
+    quickActionPresenter.bind(this);
 
     AnimationDrawable ellipsis =
         (AnimationDrawable) ContextCompat.getDrawable(getContext(), R.drawable.dancing_ellipsis);
@@ -154,12 +151,6 @@ public final class ActionsView extends CoordinatorLayout implements SwipeRefresh
   @Override public void onDetachedFromWindow() {
     super.onDetachedFromWindow();
     subscriptions.dispose();
-  }
-
-  @OnClick(R.id.actions_fab)
-  void onFABTapped() {
-
-    floatingActionMenu.setVisibility(VISIBLE);
   }
 
   @OnItemSelected(R.id.action_filter)
