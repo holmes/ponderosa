@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginEnd="@dimen/fab_mini_margin"
-    android:layout_marginBottom="@dimen/fab_mini_margin"
-    android:gravity="center_vertical"
-    app:layout_constraintBottom_toTopOf="@id/actions_fab"
-    app:layout_constraintRight_toRightOf="@id/activity_main"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
-  <TextView
-      android:id="@+id/mini_fab_title"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:clickable="true"
-      android:paddingStart="@dimen/fab_label_padding"
-      android:paddingEnd="@dimen/fab_label_padding"
-      />
-  <android.support.design.widget.FloatingActionButton
-      android:id="@+id/min_fab_fab"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:clickable="true"
-      android:src="@drawable/dev_app_icon"
-      app:fabSize="mini"
-      />
-</LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/min_fab_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/dev_app_icon"
+        app:fabSize="mini"
+        />
+    <TextView
+        android:id="@+id/mini_fab_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/min_fab_fab"
+        android:layout_marginEnd="@dimen/fab_label_padding"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:background="@drawable/fab_text_background"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingEnd="@dimen/fab_label_padding"
+        android:paddingStart="@dimen/fab_label_padding"
+        />
+</merge>

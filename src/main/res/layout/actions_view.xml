@@ -169,10 +169,9 @@
   </com.holmes.ponderosa.ui.misc.BetterViewAnimator>
 
   <android.support.constraint.ConstraintLayout
-      android:id="@+id/activity_main"
+      android:id="@+id/fab_holder"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:clipChildren="false"
       >
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/actions_fab"
@@ -180,8 +179,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/dev_app_icon"
-        app:layout_constraintBottom_toBottomOf="@+id/activity_main"
-        app:layout_constraintRight_toRightOf="@+id/activity_main"
+        app:layout_constraintBottom_toBottomOf="@+id/fab_holder"
+        app:layout_constraintRight_toRightOf="@+id/fab_holder"
         />
     <LinearLayout
         android:id="@+id/actions_fab_menu"
@@ -189,31 +188,29 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone"
+        android:clipChildren="false"
+        app:layout_constraintBottom_toTopOf="@id/actions_fab"
+        app:layout_constraintEnd_toEndOf="@id/actions_fab"
         >
       <com.holmes.ponderosa.ui.action.FabMiniRow
           android:id="@+id/fab_mini_1"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
+          style="@style/Widget.Ponderosa.FabMiniRow"
           />
       <com.holmes.ponderosa.ui.action.FabMiniRow
           android:id="@+id/fab_mini_2"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
+          style="@style/Widget.Ponderosa.FabMiniRow"
           />
       <com.holmes.ponderosa.ui.action.FabMiniRow
           android:id="@+id/fab_mini_3"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
+          style="@style/Widget.Ponderosa.FabMiniRow"
           />
       <com.holmes.ponderosa.ui.action.FabMiniRow
           android:id="@+id/fab_mini_4"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
+          style="@style/Widget.Ponderosa.FabMiniRow"
           />
       <com.holmes.ponderosa.ui.action.FabMiniRow
           android:id="@+id/fab_mini_5"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
+          style="@style/Widget.Ponderosa.FabMiniRow"
           />
         </LinearLayout>
   </android.support.constraint.ConstraintLayout>

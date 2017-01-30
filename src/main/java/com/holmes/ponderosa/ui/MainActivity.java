@@ -20,6 +20,7 @@ import butterknife.ButterKnife;
 import com.f2prateek.rx.preferences2.Preference;
 import com.f2prateek.rx.preferences2.RxSharedPreferences;
 import com.holmes.ponderosa.R;
+import com.holmes.ponderosa.data.DataFetcher;
 import com.holmes.ponderosa.data.Injector;
 import com.holmes.ponderosa.data.api.auth.CredentialManager;
 import com.holmes.ponderosa.ui.action.ActionsView;
@@ -40,6 +41,7 @@ public final class MainActivity extends Activity {
   @Inject CredentialManager credentialManager;
   @Inject ViewContainer viewContainer;
   @Inject RxSharedPreferences preferences;
+  @Inject DataFetcher dataFetcher;
 
   private ObjectGraph activityGraph;
   private Preference<Integer> lastActionView;
@@ -112,6 +114,7 @@ public final class MainActivity extends Activity {
       String password = ((TextView) dialogView.findViewById(R.id.sign_in_password)).getText().toString();
       credentialManager.save(username, password);
       drawerLayout.closeDrawers();
+      dataFetcher.refresh();
     }).setNegativeButton(R.string.cancel, (dialog, which) -> drawerLayout.closeDrawers()) //
         .show();
   }

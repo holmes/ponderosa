@@ -8,4 +8,10 @@
   <color name="avatar_stroke">#1a000000</color>
   <color name="filter_title_text">#ffffffff</color>
   <color name="selectable_background_pressed">#1f000000</color>
+
+  <color name="fab_collapsed_action_cover">#00000000</color>
+  <color name="fab_expanded_action_cover">#ddffffff</color>
+  <color name="fab_mini_text_bg_normal">#ffffffff</color>
+  <color name="fab_mini_text_bg_pressed">#bdbdbd</color>
+  <color name="fab_mini_color_border">#1a000000</color>
 </resources>

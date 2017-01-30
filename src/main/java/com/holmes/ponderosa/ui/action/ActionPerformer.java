@@ -47,6 +47,16 @@ import javax.inject.Singleton;
     updateQuickAction(QuickAction.createFrom(moshi, device, deviceControl, newValue));
   }
 
+  public void runQuickAction(QuickAction quickAction) {
+    //noinspection unchecked
+    quickAction.performAction(homeSeerService, moshi)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(result -> dataFetcher.refresh());
+
+    updateQuickAction(quickAction);
+  }
+
   private void updateQuickAction(QuickAction quickAction) {
     QuickAction.Insert_row insertRow = new QuickAction.Insert_row(db.getWritableDatabase());
     insertRow.bind(quickAction.name(), quickAction.last_ran(), quickAction.action_key(), quickAction.action_blob());
