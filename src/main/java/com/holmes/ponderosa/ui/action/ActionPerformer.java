@@ -2,10 +2,9 @@ package com.holmes.ponderosa.ui.action;
 
 import com.holmes.ponderosa.data.DataFetcher;
 import com.holmes.ponderosa.data.api.HomeSeerService;
-import com.holmes.ponderosa.data.sql.model.Device;
-import com.holmes.ponderosa.data.sql.model.DeviceControl;
 import com.holmes.ponderosa.data.sql.model.Event;
 import com.holmes.ponderosa.data.sql.model.QuickAction;
+import com.holmes.ponderosa.ui.device.DeviceWithControls;
 import com.squareup.moshi.Moshi;
 import com.squareup.sqlbrite.BriteDatabase;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -19,8 +18,8 @@ import javax.inject.Singleton;
   private final HomeSeerService homeSeerService;
   private final Moshi moshi;
 
-  @Inject public ActionPerformer(BriteDatabase db, DataFetcher dataFetcher, HomeSeerService homeSeerService,
-      Moshi moshi) {
+  @Inject
+  public ActionPerformer(BriteDatabase db, DataFetcher dataFetcher, HomeSeerService homeSeerService, Moshi moshi) {
     this.db = db;
     this.dataFetcher = dataFetcher;
     this.homeSeerService = homeSeerService;
@@ -36,15 +35,13 @@ import javax.inject.Singleton;
     updateQuickAction(QuickAction.createFrom(moshi, event));
   }
 
-  public void runDeviceControl(Device device, DeviceControl deviceControl) {
-    // TODO move this somewhere else and look at the actual controls for values.
-    int newValue = device.value() > 0 ? 0 : 255;
-    homeSeerService.controlDevice(device.ref(), newValue)
+  public void runDeviceControl(DeviceWithControls.ControlResult controlResult) {
+    homeSeerService.controlDevice(controlResult.device.ref(), controlResult.value)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(hsDevicesResponseResult -> dataFetcher.refresh());
 
-    updateQuickAction(QuickAction.createFrom(moshi, device, deviceControl, newValue));
+    updateQuickAction(QuickAction.createFrom(moshi, controlResult));
   }
 
   public void runQuickAction(QuickAction quickAction) {

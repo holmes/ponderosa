@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 public class DeviceFilters {
   @NonNull public static Predicate<Device> allowableDevices() {
     // TODO all we handle are lights for now.
-    return device -> (device.device_type() == Device.Type.PLUG_IN && device.device_subtype() == 17);
+    return device -> (device.device_type() == Device.Type.PLUG_IN);
   }
 
 }

@@ -18,7 +18,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder> {
-  public interface DeviceClickListener extends Consumer<Device> {
+
+  public interface DeviceClickListener extends Consumer<DeviceWithControls> {
   }
 
   private final Picasso picasso;
@@ -26,6 +27,7 @@ public final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.View
 
   private List<Device> devices = Collections.emptyList();
   private Map<String, List<DeviceControl>> controls = Collections.emptyMap();
+  private List<Device> filteredDevices = Collections.emptyList();
 
   DeviceAdapter(Picasso picasso, DeviceClickListener deviceClickListener) {
     this.picasso = picasso;
@@ -34,14 +36,20 @@ public final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.View
   }
 
   public void updateDevices(List<Device> devices) {
-    this.devices = devices.stream() //
-        .filter(DeviceFilters.allowableDevices()) //
-        .collect(Collectors.toList());
-    notifyDataSetChanged();
+    this.devices = devices;
+    updateFilteredDevices();
   }
 
   public void updateControls(List<DeviceControl> controls) {
+    this.controls.clear();
     this.controls = controls.stream().collect(Collectors.groupingBy(DeviceControl::device_ref));
+    updateFilteredDevices();
+  }
+
+  private void updateFilteredDevices() {
+    this.filteredDevices = devices.stream() //
+        .filter(device -> controls.containsKey(device.ref())) //
+        .collect(Collectors.toList());
     notifyDataSetChanged();
   }
 
@@ -52,31 +60,32 @@ public final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.View
   }
 
   @Override public void onBindViewHolder(ViewHolder viewHolder, int i) {
-    Device device = devices.get(i);
+    Device device = filteredDevices.get(i);
     List<DeviceControl> deviceControls = controls.get(device.ref());
-    viewHolder.bindTo(device, deviceControls);
+    viewHolder.bindTo(new DeviceWithControls(device, deviceControls));
   }
 
   @Override public long getItemId(int position) {
-    return position;
+    return Long.parseLong(filteredDevices.get(position).ref());
   }
 
   @Override public int getItemCount() {
-    return devices.size();
+    return filteredDevices.size();
   }
 
   final class ViewHolder extends RecyclerView.ViewHolder {
-    private final PublishSubject<Device> device;
+    private final PublishSubject<DeviceWithControls> deviceWithControls;
     private final CompositeDisposable disposable;
 
     ViewHolder(DeviceItemView itemView) {
       super(itemView);
 
-      this.device = PublishSubject.create();
+      this.deviceWithControls = PublishSubject.create();
       this.disposable = new CompositeDisposable();
 
       this.disposable.add( //
-          this.device.map(current -> {
+          this.deviceWithControls.map(deviceWithControls -> {
+            Device current = deviceWithControls.device;
             String title = current.location() + " " + current.name();
             String status = current.status();
             String statusImage = "https://connected.homeseer.com/" + current.status_image();
@@ -87,12 +96,12 @@ public final class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.View
       this.disposable.add(RxJavaInterop.toV2Observable( //
           RxView.clicks(itemView) //
               .map(aVoid -> "")) // Hack for RxJava2.
-          .map(aVoid -> devices.get(getAdapterPosition())) //
+          .withLatestFrom(deviceWithControls, (s, deviceWithControls) -> deviceWithControls)
           .subscribe(deviceClickListener));
     }
 
-    void bindTo(Device device, List<DeviceControl> deviceControls) {
-      this.device.onNext(device);
+    void bindTo(DeviceWithControls deviceWithControls) {
+      this.deviceWithControls.onNext(deviceWithControls);
     }
   }
 }

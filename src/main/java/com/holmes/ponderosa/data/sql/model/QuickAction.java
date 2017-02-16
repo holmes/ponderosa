@@ -6,6 +6,7 @@ import com.holmes.ponderosa.QuickActionModel;
 import com.holmes.ponderosa.data.api.HomeSeerService;
 import com.holmes.ponderosa.data.api.model.HSDevicesResponse;
 import com.holmes.ponderosa.data.api.model.HSEventsResponse;
+import com.holmes.ponderosa.ui.device.DeviceWithControls.ControlResult;
 import com.jakewharton.retrofit2.adapter.rxjava2.Result;
 import com.squareup.moshi.Moshi;
 import com.squareup.sqldelight.RowMapper;
@@ -29,10 +30,13 @@ import timber.log.Timber;
   }
 
   @SuppressLint("DefaultLocale") //
-  public static QuickAction createFrom(Moshi moshi, Device device, DeviceControl deviceControl, Integer value) {
-    String key = String.format(DEVICE_KEY, device.ref(), deviceControl._id());
-    QuickActionDevice quickActionDevice = new QuickActionDevice(device.name(), device.ref(), value);
+  public static QuickAction createFrom(Moshi moshi, ControlResult controlResult) {
+    Device device = controlResult.device;
+    String key = String.format(DEVICE_KEY, device.ref(), controlResult.selectedUse.ordinal());
+
+    QuickActionDevice quickActionDevice = new QuickActionDevice(device.name(), device.ref(), controlResult.value);
     String blob = moshi.adapter(QuickActionDevice.class).toJson(quickActionDevice);
+
     return new AutoValue_QuickAction(-1, quickActionDevice.name, System.currentTimeMillis(), key, blob);
   }
 
@@ -74,9 +78,9 @@ import timber.log.Timber;
   private static class QuickActionDevice implements QuickActionBlob<HSDevicesResponse> {
     final String name;
     final String id;
-    final int value;
+    final long value;
 
-    private QuickActionDevice(String name, String id, int value) {
+    private QuickActionDevice(String name, String id, long value) {
       this.name = name;
       this.id = id;
       this.value = value;

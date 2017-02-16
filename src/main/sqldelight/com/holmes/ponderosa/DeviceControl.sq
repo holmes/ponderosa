@@ -4,6 +4,7 @@ CREATE TABLE device_control (
   _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   device_ref TEXT NOT NULL,
   label TEXT NOT NULL,
+  value INTEGER NOT NULL,
   type INTEGER AS DeviceControl.Type NOT NULL,
   use INTEGER AS DeviceControl.Use NOT NULL
 );
@@ -16,5 +17,5 @@ SELECT *
 FROM device_control;
 
 insert_row:
-INSERT OR REPLACE INTO device_control(device_ref, label, type, use)
-VALUES (?, ?, ?, ?);
+INSERT OR REPLACE INTO device_control(device_ref, label, value, type, use)
+VALUES (?, ?, ?, ?, ?);

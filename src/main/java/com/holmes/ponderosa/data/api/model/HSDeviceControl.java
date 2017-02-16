@@ -24,11 +24,13 @@ public class HSDeviceControl {
     @NonNull public final String Label;
     @NonNull public final int ControlType;
     @NonNull public final int ControlUse;
+    @NonNull public final int ControlValue;
 
-    public Option(@NonNull String label, @NonNull int controlType, @NonNull int controlUse) {
+    public Option(@NonNull String label, @NonNull int controlType, @NonNull int controlUse, @NonNull int controlValue) {
       Label = label;
       ControlType = controlType;
       ControlUse = controlUse;
+      ControlValue = controlValue;
     }
   }
 }

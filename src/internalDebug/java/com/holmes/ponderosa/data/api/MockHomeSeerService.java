@@ -22,7 +22,7 @@ public class MockHomeSeerService implements HomeSeerService {
   }
 
   @Override
-  public Observable<Result<HSDevicesResponse>> controlDevice(@Query("ref") String reference, @Query("value") Integer value) {
+  public Observable<Result<HSDevicesResponse>> controlDevice(@Query("ref") String reference, @Query("value") Long value) {
     throw new UnsupportedOperationException("implement me!");
   }
 

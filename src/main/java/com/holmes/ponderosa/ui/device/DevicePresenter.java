@@ -53,7 +53,8 @@ import static java.util.stream.Collectors.toList;
     controls = RxJavaInterop.toV2Observable( //
         db.createQuery(DeviceControlModel.TABLE_NAME, DeviceControlModel.SELECT_ALL) //
             .mapToList(DeviceControl.SELECT_ALL_MAPPER::map)) //
-        .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        .subscribeOn(Schedulers.io()) //
+        .observeOn(AndroidSchedulers.mainThread());
 
     filters = devices.map((foundDevices) -> foundDevices.stream() //
         .filter(DeviceFilters.allowableDevices()).map(Device::location) //
@@ -97,7 +98,8 @@ import static java.util.stream.Collectors.toList;
     return deviceAdapter;
   }
 
-  @Override public void accept(Device device) {
-    actionPerformer.runDeviceControl(device, null);
+  @Override public void accept(DeviceWithControls deviceWithControls) {
+    DeviceWithControls.ControlResult controlResult = deviceWithControls.toggleDevice();
+    actionPerformer.runDeviceControl(controlResult);
   }
 }

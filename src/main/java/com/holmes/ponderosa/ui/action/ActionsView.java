@@ -1,6 +1,8 @@
 package com.holmes.ponderosa.ui.action;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
@@ -113,6 +115,23 @@ public final class ActionsView extends CoordinatorLayout implements SwipeRefresh
     itemsView.setLayoutManager(new LinearLayoutManager(getContext()));
     itemsView.addItemDecoration(
         new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, dividerPaddingStart, safeIsRtl()));
+
+
+    // create notification builder object
+    Context context = getContext();
+    Notification.Builder builder = new Notification.Builder(context);
+    builder
+        .setContentText("This is a demo message")
+        .setContentTitle(context.getString(R.string.application_name))
+        .setSmallIcon(R.drawable.app_icon)
+        .setPriority(Notification.PRIORITY_MIN)
+        .setAutoCancel(false);
+
+    Notification notification = builder.build();
+    notification.flags |= Notification.FLAG_NO_CLEAR;
+    NotificationManager manager = (NotificationManager) context
+        .getSystemService(Context.NOTIFICATION_SERVICE);
+    manager.notify(22, notification);
   }
 
   public void loadPresenter(PresenterType type) {

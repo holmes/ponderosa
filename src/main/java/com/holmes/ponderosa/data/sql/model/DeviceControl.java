@@ -82,5 +82,28 @@ import com.squareup.sqldelight.RowMapper;
     public static Use fromValue(int value) {
       return values()[value];
     }
+
+    public Long defaultValue() {
+      switch (this) {
+        case ON:
+          return 99L;
+        case OFF:
+          return 0L;
+        case DIM:
+          return 1L;
+        case ON_ALTERNATE:
+          return 255L;
+        case NOT_SPECIFIED:
+        case PLAY:
+        case PAUSE:
+        case STOP:
+        case FORWARD:
+        case REWIND:
+        case REPEAT:
+        case SHUFFLE:
+        default:
+          return -1L;
+      }
+    }
   }
 }

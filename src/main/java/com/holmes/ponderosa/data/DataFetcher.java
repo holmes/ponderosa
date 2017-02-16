@@ -61,7 +61,7 @@ public class DataFetcher {
           DeviceControlModel.Insert_row insertRow =
               new DeviceControlModel.Insert_row(db.getWritableDatabase(), DeviceControl.FACTORY);
 
-          insertRow.bind(deviceControl.ref, option.Label, Type.fromValue(option.ControlType),
+          insertRow.bind(deviceControl.ref, option.Label, option.ControlValue, Type.fromValue(option.ControlType),
               Use.fromValue(option.ControlUse));
 
           db.executeInsert(DeviceControlModel.TABLE_NAME, insertRow.program);
